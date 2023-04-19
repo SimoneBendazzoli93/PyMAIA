@@ -55,6 +55,7 @@ setup(
             "nndet_run_training = Hive_scripts.nndet_run_training:main",
             "Hive_convert_semantic_to_instance_segmentation = Hive_scripts.Hive_convert_semantic_to_instance_segmentation:main",
             "Hive_extract_experiment_predictions = Hive_scripts.Hive_extract_experiment_predictions:main",
+            "nndet_compute_metric_results = Hive_scripts.nndet_compute_metric_results:main",
             "Hive_order_data_folder = Hive_scripts.Hive_order_data_folder:main",
         ],
     },
