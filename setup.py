@@ -45,6 +45,7 @@ setup(
     package_data={
         "": ["configs/*.yml", "configs/*.json"],
     },
+    data_files=[('', ['VERSION', "requirements.txt"]), ],
     # package_dir={"": "src"},
     install_requires=resolve_requirements(os.path.join(os.path.dirname(__file__), "requirements.txt")),
     entry_points={
