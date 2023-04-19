@@ -32,8 +32,8 @@ setup(
     license="GPLv3",
     project_urls={
         "Documentation": "https://hive-maia.readthedocs.io",
-        "Source": "https://github.com/MAIA-KTH/Hive",
-        "Tracker": "https://github.com/MAIA-KTH/Hive/issues",
+        "Source": "https://gits-15.sys.kth.se/MAIA/Hive",
+        "Tracker": "https://gits-15.sys.kth.se/MAIA/Hive/issues",
     },
     author="Simone Bendazzoli",
     author_email="simben@kth.se",
