@@ -84,6 +84,38 @@ def subfolders(folder: Union[str, PathLike], join: bool = True, sort: bool = Tru
     return res
 
 
+def create_nnunet_data_folder_tree(data_folder: str, task_name: str, task_id: str, subfolder: str = None):
+    """
+    Create nnUNet_raw_data_base folder tree, ready to be populated with the dataset
+
+    :param data_folder: folder path corresponding to the nnUNet_raw_data_base ENV variable
+    :param task_id: string used as task_id when creating task folder
+    :param task_name: string used as task_name when creating task folder
+    :param subfolder: optional subfolder path for the data_folder tree
+    """  # noqa E501
+    logger.log(DEBUG, ' Creating Dataset tree at "{}"'.format(data_folder))
+
+    Path(data_folder).joinpath("nnUNet_raw_data", "Task" + task_id + "_" + task_name, "imagesTr", ).mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    Path(data_folder).joinpath("nnUNet_raw_data", "Task" + task_id + "_" + task_name, "labelsTr", ).mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    Path(data_folder).joinpath("nnUNet_raw_data", "Task" + task_id + "_" + task_name, "imagesTs", ).mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    Path(data_folder).joinpath("nnUNet_raw_data", "Task" + task_id + "_" + task_name, "labelsTs", ).mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+
 def create_nndet_data_folder_tree(data_folder: Union[str, PathLike], task_name: str, task_id: str):
     """
     Create nnDetection folder tree, ready to be populated with the dataset.
