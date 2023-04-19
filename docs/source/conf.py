@@ -26,11 +26,11 @@ import Hive
 # -- Project information -----------------------------------------------------
 
 project = "Hive"
-copyright = "2022, Simone Bendazzoli"
+copyright = "2023, Simone Bendazzoli"
 author = "Simone Bendazzoli"
 
 # The full version, including alpha/beta/rc tags
-release = "1.0"
+release = "1.1.1"
 
 exclude_patterns = ["configs"]
 
