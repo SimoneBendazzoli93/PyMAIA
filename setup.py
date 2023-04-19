@@ -3,6 +3,9 @@ import os
 import setuptools
 from setuptools import setup
 
+with open(os.path.join('VERSION')) as version_file:
+    version = version_file.read().strip()
+
 
 def resolve_requirements(file):
     requirements = []
@@ -24,7 +27,7 @@ def read_file(file):
 
 setup(
     name="hive-maia",
-    version="1.0",
+    version=version,
     url="https://github.com/MAIA-KTH/Hive.git",
     license="GPLv3",
     project_urls={
