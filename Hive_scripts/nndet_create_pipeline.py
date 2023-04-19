@@ -164,7 +164,7 @@ def main():
 
     [pipeline_steps.append(step) for step in run_training_step(output_json_config_file, range(config_dict["n_folds"]))]
 
-    pipeline_steps.append(run_training_step(output_json_config_file, "-1"))
+    pipeline_steps.append(run_training_step(output_json_config_file, [-1]))
 
     Path(os.environ["root_experiment_folder"]).joinpath(config_dict["Experiment Name"]).mkdir(exist_ok=True,
                                                                                               parents=True)
