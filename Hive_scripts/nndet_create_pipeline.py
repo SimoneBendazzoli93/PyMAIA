@@ -95,6 +95,8 @@ def run_data_and_folder_preparation_step(arguments):
         config_dict["DatasetName"] + "_" + config_dict["Experiment Name"],
         "--config-file",
         arguments["config_file"],
+        "--test-split",
+        arguments["test_split"]
     ]
 
     return args
