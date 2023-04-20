@@ -182,6 +182,7 @@ def main():
 
     if arguments["output_file"] is not None:
         output_file = arguments["output_file"]
+        Path(output_file).parent.mkdir(parents=True, exist_ok=True)
 
     pipeline_steps_summary = open(output_file
                                   ,
