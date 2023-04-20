@@ -3,6 +3,7 @@
 import datetime
 import importlib.resources
 import json
+import logging
 import os
 from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
@@ -69,6 +70,13 @@ def get_arg_parser():
         type=str,
         required=True,
         help="Configuration JSON file with experiment and dataset parameters.",
+    )
+
+    pars.add_argument(
+        "--output-file",
+        type=str,
+        required=False,
+        help="Output TXT file path  where to save the pipeline steps.",
     )
 
     add_verbosity_options_to_argparser(pars)
@@ -146,7 +154,7 @@ def main():
                 config_dict = json.load(json_file)
 
     output_json_config_filename = (
-        config_dict["DatasetName"] + "_" + config_dict["Experiment Name"] + "_" + arguments["task_ID"] + ".json"
+            config_dict["DatasetName"] + "_" + config_dict["Experiment Name"] + "_" + arguments["task_ID"] + ".json"
     )
     os.environ["RESULTS_FOLDER"] = str(
         Path(os.environ["root_experiment_folder"]).joinpath(
@@ -167,13 +175,20 @@ def main():
 
     Path(os.environ["root_experiment_folder"]).joinpath(config_dict["Experiment Name"]).mkdir(exist_ok=True,
                                                                                               parents=True)
-    pipeline_steps_summary = open(
-        Path(os.environ["root_experiment_folder"]).joinpath(
-            config_dict["Experiment Name"], "Task_" + arguments["task_ID"] + "_" + TIMESTAMP + ".txt"
-        ),
-        "w",
+
+    output_file = Path(os.environ["root_experiment_folder"]).joinpath(
+        config_dict["Experiment Name"], "Task_" + arguments["task_ID"] + "_" + TIMESTAMP + ".txt"
     )
-    for step in pipeline_steps:
+
+    if arguments["output_file"] is not None:
+        output_file = arguments["output_file"]
+
+    pipeline_steps_summary = open(output_file
+                                  ,
+                                  "w",
+                                  )
+    for it, step in enumerate(pipeline_steps):
+        logger.log(logging.INFO, "Step {}: {}".format(it, " ".join(step)))
         pipeline_steps_summary.write(" ".join(step) + "\n")
 
     pipeline_steps_summary.close()
