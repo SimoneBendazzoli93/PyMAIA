@@ -79,6 +79,13 @@ def get_arg_parser():
         help="Output TXT file path  where to save the pipeline steps.",
     )
 
+    pars.add_argument(
+        "--training-config-file",
+        type=str,
+        required=False,
+        help="Optional JSON file path with nnDetection training configuration.",
+    )
+
     add_verbosity_options_to_argparser(pars)
 
     return pars
@@ -122,7 +129,7 @@ def run_preprocessing_step(config_file):
     return args
 
 
-def run_training_step(config_file, folds):
+def run_training_step(config_file, folds, extra_params=None):
     arg_list = []
     for fold in folds:
         args = [
@@ -132,6 +139,11 @@ def run_training_step(config_file, folds):
             "--run-fold",
             str(fold),
         ]
+        if extra_params is not None:
+            args.append("--overwrites")
+            for parameter in extra_params:
+                args.append("{}={}".format(parameter, extra_params[parameter]))
+
         arg_list.append(args)
     return arg_list
 
@@ -170,8 +182,14 @@ def main():
     pipeline_steps.append(run_data_and_folder_preparation_step(arguments))
     pipeline_steps.append(run_preprocessing_step(output_json_config_file))
 
+    training_params = None
+    if arguments["training_config_file"] is not None:
+        with open(arguments["training_config_file"], "r") as f:
+            training_params = json.load(f)
+
     [pipeline_steps.append(step) for step in
-     run_training_step(output_json_config_file, list(range(config_dict["n_folds"])) + [-1, ])]
+     run_training_step(output_json_config_file, list(range(config_dict["n_folds"])) + [-1, ],
+                       extra_params=training_params)]
 
     Path(os.environ["root_experiment_folder"]).joinpath(config_dict["Experiment Name"]).mkdir(exist_ok=True,
                                                                                               parents=True)
