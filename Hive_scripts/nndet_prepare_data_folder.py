@@ -5,7 +5,6 @@ import datetime
 import importlib.resources
 import json
 import os
-import re
 from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 from textwrap import dedent
@@ -21,7 +20,7 @@ from Hive.utils.file_utils import (
     save_config_json,
     generate_dataset_json,
 )
-from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args, INFO
+from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
 
 TIMESTAMP = "{:%Y-%m-%d_%H-%M-%S}".format(datetime.datetime.now())
 
@@ -63,27 +62,15 @@ def main():
             with open(json_path) as json_file:
                 config_dict = json.load(json_file)
 
-    if "receiver_email" not in os.environ:
-        try:
-            user_email = input("Please Enter a valid e-mail to receive experiments updates:\n")
-            regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-            if re.fullmatch(regex, user_email):
-                logger.log(INFO, "Using {} for e-mail updates.".format(user_email))
-                config_dict["receiver_email"] = user_email
-            else:
-                logger.log(INFO, "{} not valid, disabling e-mail updates.".format(user_email))
-        except KeyboardInterrupt:
-            logger.log(INFO, "Disabling e-mail updates.")
-
-    os.environ["raw_data_base"] = str(Path(os.environ["root_experiment_folder"]).joinpath(config_dict["Experiment Name"]))
+    os.environ["raw_data_base"] = str(Path(os.environ["ROOT_FOLDER"]).joinpath(config_dict["Experiment Name"]))
 
     os.environ["preprocessed_folder"] = str(
-        Path(os.environ["root_experiment_folder"]).joinpath(
+        Path(os.environ["ROOT_FOLDER"]).joinpath(
             config_dict["Experiment Name"], "Task" + arguments["task_ID"] + "_" + arguments["task_name"], "preprocessed"
         )
     )
     os.environ["RESULTS_FOLDER"] = str(
-        Path(os.environ["root_experiment_folder"]).joinpath(
+        Path(os.environ["ROOT_FOLDER"]).joinpath(
             config_dict["Experiment Name"], "Task" + arguments["task_ID"] + "_" + arguments["task_name"], "results"
         )
     )
@@ -119,7 +106,7 @@ def main():
             dataset_split_dict = {"Subject": train_dataset_sorted[test], "Split": "Validation_fold_{}".format(i)}
             dataset_split.append(dataset_split_dict)
 
-    dataset_split_summary = Path(os.environ["root_experiment_folder"]).joinpath(
+    dataset_split_summary = Path(os.environ["ROOT_FOLDER"]).joinpath(
         config_dict["Experiment Name"], "dataset_split.csv"
     )
 
@@ -148,8 +135,6 @@ def main():
         save_label_instance_config=True,
     )
 
-    n_tasks = 1
-
     generate_dataset_json(
         str(
             Path(os.environ["raw_data_base"]).joinpath(
@@ -160,9 +145,8 @@ def main():
         test_dataset,
         list(config_dict["Modalities"].values()),
         config_dict["label_dict"],
-        config_dict["DatasetName"],
-        n_tasks=n_tasks,
         task_name="Task{}_{}".format(arguments["task_ID"], arguments["task_name"]),
+        file_extension=config_dict["FileExtension"],
     )
 
     config_dict["Task_ID"] = arguments["task_ID"]
@@ -170,7 +154,7 @@ def main():
     config_dict["train_test_split"] = arguments["test_split"]
     config_dict["base_folder"] = os.environ["raw_data_base"]
 
-    output_json_basename = config_dict["Task_Name"] + "_" + config_dict["Task_ID"] + ".json"
+    output_json_basename = "Task" + arguments["task_ID"] + "_" + config_dict["Experiment Name"] + ".json"
 
     try:
         config_dict["results_folder"] = os.environ["RESULTS_FOLDER"]

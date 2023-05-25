@@ -107,11 +107,11 @@ def run_data_and_folder_preparation_step(arguments):
         "--task-ID",
         arguments["task_ID"],
         "--task-name",
-        config_dict["DatasetName"] + "_" + config_dict["Experiment Name"],
+        config_dict["Experiment Name"],
         "--config-file",
         arguments["config_file"],
         "--test-split",
-        str(arguments["test_split"])
+        str(arguments["test_split"]),
     ]
 
     return args
@@ -165,13 +165,11 @@ def main():
             with open(json_path) as json_file:
                 config_dict = json.load(json_file)
 
-    output_json_config_filename = (
-            config_dict["DatasetName"] + "_" + config_dict["Experiment Name"] + "_" + arguments["task_ID"] + ".json"
-    )
+    output_json_config_filename = "Task" + arguments["task_ID"] + "_" + config_dict["Experiment Name"] + ".json"
     os.environ["RESULTS_FOLDER"] = str(
-        Path(os.environ["root_experiment_folder"]).joinpath(
+        Path(os.environ["ROOT_FOLDER"]).joinpath(
             config_dict["Experiment Name"],
-            "Task" + arguments["task_ID"] + "_" + config_dict["DatasetName"] + "_" + config_dict["Experiment Name"],
+            "Task" + arguments["task_ID"] + "_" + config_dict["Experiment Name"],
             "results",
         )
     )
@@ -187,14 +185,22 @@ def main():
         with open(arguments["training_config_file"], "r") as f:
             training_params = json.load(f)
 
-    [pipeline_steps.append(step) for step in
-     run_training_step(output_json_config_file, list(range(config_dict["n_folds"])) + [-1, ],
-                       extra_params=training_params)]
+    [
+        pipeline_steps.append(step)
+        for step in run_training_step(
+        output_json_config_file,
+        list(range(config_dict["n_folds"]))
+        + [
+            -1,
+        ],
+        extra_params=training_params,
+    )
+    ]
 
-    Path(os.environ["root_experiment_folder"]).joinpath(config_dict["Experiment Name"]).mkdir(exist_ok=True,
-                                                                                              parents=True)
+    Path(os.environ["ROOT_FOLDER"]).joinpath(config_dict["Experiment Name"]).mkdir(exist_ok=True,
+                                                                                   parents=True)
 
-    output_file = Path(os.environ["root_experiment_folder"]).joinpath(
+    output_file = Path(os.environ["ROOT_FOLDER"]).joinpath(
         config_dict["Experiment Name"], "Task_" + arguments["task_ID"] + "_" + TIMESTAMP + ".txt"
     )
 
@@ -202,10 +208,10 @@ def main():
         output_file = arguments["output_file"]
         Path(output_file).parent.mkdir(parents=True, exist_ok=True)
 
-    pipeline_steps_summary = open(output_file
-                                  ,
-                                  "w",
-                                  )
+    pipeline_steps_summary = open(
+        output_file,
+        "w",
+    )
     for it, step in enumerate(pipeline_steps):
         logger.log(logging.INFO, "Step {}: {}".format(it, " ".join(step)))
         pipeline_steps_summary.write(" ".join(step) + "\n")
