@@ -207,13 +207,19 @@ def create_nndet_data_folder_tree(data_folder: Union[str, PathLike], task_name: 
     )
 
 
-def split_dataset(input_data_folder: Union[str, PathLike], test_split_ratio: int, seed: int) -> Tuple[
+def split_dataset(input_data_folder: Union[str, PathLike], test_split_ratio: int, seed: int,
+                  patient_class_file: Union[str, PathLike] = None,
+                  classes: List[str] = None) -> Tuple[
     List[str], List[str]]:
     """
     Split dataset into a train/test split, given the specified ratio.
 
     Parameters
     ----------
+    classes :
+        List of Patient classes to include in the experiment.
+    patient_class_file  :
+        File path to JSON Patient Class map.
     input_data_folder :
         folder path of the input dataset.
     test_split_ratio :
@@ -226,6 +232,17 @@ def split_dataset(input_data_folder: Union[str, PathLike], test_split_ratio: int
         lists of strings containing subject IDs for train set and test set respectively.
     """
     subjects = subfolders(input_data_folder, join=False)
+
+    if patient_class_file is not None:
+        with open(patient_class_file, "r") as file:
+            subject_class = json.load(file)
+
+        if classes is not None:
+            filtered_subjects = []
+            for subject in subjects:
+                if subject_class[subject] in classes and subject != "PETCT_0223010e46_0":
+                    filtered_subjects.append(subject)
+            subjects = filtered_subjects
 
     random.seed(seed)
     random.shuffle(subjects)
