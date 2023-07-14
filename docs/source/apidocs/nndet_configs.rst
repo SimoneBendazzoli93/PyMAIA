@@ -16,6 +16,5 @@ nnDetection config
             "0": "ABD_Lymph_Node"
         },
         "n_folds": 5,
-        "DatasetName": "LymphNodeSeg_ABD",
         "FileExtension": ".nii.gz"
     }

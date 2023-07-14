@@ -24,15 +24,19 @@ The standard dataset folder structure is the following:
 
 ## 2. Create Pipeline File
 
-After organizing the Dataset folder according to the standard format, you are ready to generate a *Pipeline file*, that will be later used to run all the experiment steps (Data Preparation, Preprocessing and Training).
-In order to do so, you first need to prepare a JSON configuration file, specifying all the parameters and attributes for the experiment, as described in the section `Configs -> nnDetection config`. Some default config files are made available with the **Hive** package, in the **configs** section.
-In addition, *root_experiment_folder* should be set as an environment variable (this will be the base folder for all the experiments that will be created). Check it with:
+After organizing the Dataset folder according to the standard format, you are ready to generate a *Pipeline file*, that
+will be later used to run all the experiment steps (Data Preparation, Preprocessing and Training).
+In order to do so, you first need to prepare a JSON configuration file, specifying all the parameters and attributes for
+the experiment, as described in the section `Configs -> nnDetection config`. Some default config files are made
+available with the **Hive** package, in the **configs** section.
+In addition, *ROOT_FOLDER* should be set as an environment variable (this will be the base folder for all the
+experiments that will be created). Check it with:
 ```
-echo $root_experiment_folder
+echo $ROOT_FOLDER
 ```
 and, if not present, run:
 ```
-export root_experiment_folder=/YOUR/PATH/TO/Experiments
+export ROOT_FOLDER=/YOUR/PATH/TO/Experiments
 ```
 To generate the *Pipeline file*, run:
 ```
@@ -44,9 +48,13 @@ Optionally, you can set the split ratio (in %, set a value between 0-100) betwee
 ```
 Hive_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000 --test-split 20
 ```
-By default, 80% of the available data will be dedicated for cross-fold validation, while 20% will be reserved as testing set.
 
-The *Pipeline file* will be available, as a *txt* file, in `root_experiment_folder/experiment_folder`, with *experiment_folder* as indicated in the config file with the  `"Experiment Name"` attribute. 
+By default, 80% of the available data will be dedicated for cross-fold validation, while 20% will be reserved as testing
+set.
+
+The *Pipeline file* will be available, as a *txt* file, in `ROOT_FOLDER/experiment_folder`, with *experiment_folder* as
+indicated in the config file with the  `"Experiment Name"` attribute.
+
 ## 3. Run Pipeline
 Once the *Pipeline file* is created, you are ready to run your nnDetection experiment, either with the available script, or by just copying/pasting the single commands from the *txt* file into your shell.
 To run the full pipeline with the **Hive** script:
