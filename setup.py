@@ -63,6 +63,7 @@ setup(
             "Hive_order_data_folder = Hive_scripts.Hive_order_data_folder:main",
             "nnunet_prepare_data_folder = Hive_scripts.nnunet_prepare_data_folder:main",
             "nnunet_run_preprocessing = Hive_scripts.nnunet_run_preprocessing:main",
+            "nnunet_run_training = Hive_scripts.nnunet_run_training:main",
         ],
     },
     keywords=["deep learning", "image segmentation", "medical image analysis", "medical image segmentation",
