@@ -61,6 +61,7 @@ setup(
             "Hive_extract_experiment_predictions = Hive_scripts.Hive_extract_experiment_predictions:main",
             "nndet_compute_metric_results = Hive_scripts.nndet_compute_metric_results:main",
             "Hive_order_data_folder = Hive_scripts.Hive_order_data_folder:main",
+            "nnunet_prepare_data_folder = Hive_scripts.nnunet_prepare_data_folder:main",
         ],
     },
     keywords=["deep learning", "image segmentation", "medical image analysis", "medical image segmentation",
