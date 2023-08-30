@@ -4,7 +4,7 @@ import tempfile
 import time
 from os import PathLike
 from pathlib import Path
-from typing import Union
+from typing import Union, Dict
 
 import SimpleITK as sitk
 import dicom2nifti
@@ -70,7 +70,8 @@ def dcm2nii_mask(mask_dcm_path: Union[str, PathLike], nii_out_path: Union[str, P
     nib.save(mask_out, nii_out_path)
 
 
-def convert_DICOM_folder_to_NIFTI_image(patient_dicom_folder: Union[str, PathLike], patient_nifti_folder: Union[str, PathLike]):
+def convert_DICOM_folder_to_NIFTI_image(patient_dicom_folder: Union[str, PathLike],
+                                        patient_nifti_folder: Union[str, PathLike]) -> Dict[str, str]:
     """
     Converts a given Patient DICOM folder into NIFTI format, saving the DICOM Studies in different folders.
 
@@ -81,6 +82,10 @@ def convert_DICOM_folder_to_NIFTI_image(patient_dicom_folder: Union[str, PathLik
     patient_nifti_folder :
         Output NIFTI folder used as stem to save the DICOM Studies. The Study index is appended to this path to create
         the corresponding NIFTI study folder path.
+
+    Returns
+    -------
+    Dictionary mapping each Patient -> Study ID to the corresponding StudyInstanceUID
     """
     studies = subfolders(patient_dicom_folder, join=False)
     single_study = False
@@ -89,7 +94,6 @@ def convert_DICOM_folder_to_NIFTI_image(patient_dicom_folder: Union[str, PathLik
 
     patient_study_map = {Path(patient_dicom_folder).name: {}}
     for study_id, study in enumerate(studies):
-        patient_study_map[Path(patient_dicom_folder).name][study_id] = study
         if not single_study:
             Path(str(patient_nifti_folder) + "_{}".format(study_id)).mkdir(parents=True, exist_ok=True)
         else:
