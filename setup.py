@@ -52,6 +52,7 @@ setup(
         "console_scripts": [
             "Hive_convert_DICOM_dataset_to_NIFTI_dataset = Hive_scripts.Hive_convert_DICOM_dataset_to_NIFTI_dataset:main",
             "Hive_run_pipeline_from_file = Hive_scripts.Hive_run_pipeline_from_file:main",
+            "Hive_convert_NIFTI_predictions_to_DICOM_SEG = Hive_scripts.Hive_convert_NIFTI_predictions_to_DICOM_SEG:main",
             "Hive_create_subset = Hive_scripts.Hive_create_subset:main",
             "nndet_create_pipeline = Hive_scripts.nndet_create_pipeline:main",
             "nndet_prepare_data_folder = Hive_scripts.nndet_prepare_data_folder:main",

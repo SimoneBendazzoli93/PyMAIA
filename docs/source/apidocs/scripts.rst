@@ -11,6 +11,7 @@ Hive Scripts
    Hive_convert_semantic_to_instance_segmentation
    Hive_create_subset
    Hive_order_data_folder
+   Hive_convert_NIFTI_predictions_to_DICOM_SEG
 
 Hive Scripts for nnDetection
 ---------------
