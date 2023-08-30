@@ -11,5 +11,6 @@ scikit_learn
 scipy
 SimpleITK
 tqdm
+nilearn
 pandas
 openpyxl

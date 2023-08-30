@@ -1,3 +1,4 @@
+import math
 import shutil
 import tempfile
 import time
@@ -7,10 +8,10 @@ from typing import Union
 
 import SimpleITK as sitk
 import dicom2nifti
-import math
 import nibabel as nib
 import numpy as np
 import pydicom
+from nilearn.image import resample_to_img
 from pydicom import dcmread
 
 from Hive.utils.file_utils import subfolders
@@ -97,6 +98,11 @@ def convert_DICOM_folder_to_NIFTI_image(patient_dicom_folder: Union[str, PathLik
         for serie in series:
             first_file = next(Path(patient_dicom_folder).joinpath(study, serie).glob("*.dcm"))
             ds = pydicom.dcmread(str(first_file))
+            patient_study_map[Path(patient_dicom_folder).name][study_id] = str(ds['StudyInstanceUID'].value)
+
+            if Path(patient_dicom_folder).name != ds['PatientName'].value:
+                print(
+                    f"WARNING! Patient name is different: {ds['PatientName'].value} instead of {Path(patient_dicom_folder).name}")
 
             if ds.Modality == "CT":
                 if not single_study:
@@ -124,32 +130,34 @@ def convert_DICOM_folder_to_NIFTI_image(patient_dicom_folder: Union[str, PathLik
                     )
                 normalize_PET_to_SUV_BW(str(Path(patient_dicom_folder).joinpath(study, serie)), pet_filename)
 
-        for study_id, study in enumerate(studies):
-            series = subfolders(Path(patient_dicom_folder).joinpath(study), join=False)
-            for serie in series:
-                first_file = next(Path(patient_dicom_folder).joinpath(study, serie).glob("*.dcm"))
-                ds = pydicom.dcmread(str(first_file))
+    for study_id, study in enumerate(studies):
+        series = subfolders(Path(patient_dicom_folder).joinpath(study), join=False)
+        for serie in series:
+            first_file = next(Path(patient_dicom_folder).joinpath(study, serie).glob("*.dcm"))
+            ds = pydicom.dcmread(str(first_file))
 
-                if ds.Modality == "SEG":
-                    if not single_study:
-                        seg_filename = str(
-                            Path(str(patient_nifti_folder) + "_{}".format(study_id)).joinpath(
-                                "{}_{}_SEG.nii.gz".format(Path(patient_dicom_folder).name, study_id)
-                            )
+            if ds.Modality == "SEG":
+                if not single_study:
+                    seg_filename = str(
+                        Path(str(patient_nifti_folder) + "_{}".format(study_id)).joinpath(
+                            "{}_{}_SEG.nii.gz".format(Path(patient_dicom_folder).name, study_id)
                         )
-                        ref_filename = str(
-                            Path(str(patient_nifti_folder) + "_{}".format(study_id)).joinpath(
-                                "{}_{}_PET.nii.gz".format(Path(patient_dicom_folder).name, study_id)
-                            )
+                    )
+                    ref_filename = str(
+                        Path(str(patient_nifti_folder) + "_{}".format(study_id)).joinpath(
+                            "{}_{}_PET.nii.gz".format(Path(patient_dicom_folder).name, study_id)
                         )
-                    else:
-                        seg_filename = str(
-                            Path(str(patient_nifti_folder)).joinpath("{}_SEG.nii.gz".format(Path(patient_dicom_folder).name))
-                        )
-                        ref_filename = str(
-                            Path(str(patient_nifti_folder)).joinpath("{}_PET.nii.gz".format(Path(patient_dicom_folder).name))
-                        )
-                    dcm2nii_mask(Path(patient_dicom_folder).joinpath(study, serie), seg_filename, ref_filename)
+                    )
+                else:
+                    seg_filename = str(
+                        Path(str(patient_nifti_folder)).joinpath(
+                            "{}_SEG.nii.gz".format(Path(patient_dicom_folder).name))
+                    )
+                    ref_filename = str(
+                        Path(str(patient_nifti_folder)).joinpath(
+                            "{}_PET.nii.gz".format(Path(patient_dicom_folder).name))
+                    )
+                dcm2nii_mask(Path(patient_dicom_folder).joinpath(study, serie), seg_filename, ref_filename)
     return patient_study_map
 
 def normalize_PET_to_SUV_BW(dicom_pet_series_folder: Union[str, PathLike], suv_pet_filename: Union[str, PathLike]):
@@ -224,3 +232,24 @@ def normalize_PET_to_SUV_BW(dicom_pet_series_folder: Union[str, PathLike], suv_p
     itk_image.CopyInformation(image)
 
     sitk.WriteImage(itk_image, suv_pet_filename)
+
+
+def resample_image(nii_input_path: Union[str, PathLike], nii_ref_path: Union[str, PathLike],
+                   nii_out_path: Union[str, PathLike]):
+    """
+    Resample Input NIFTI to match Reference NIFTI size and spacing.
+
+    Parameters
+    ----------
+    nii_input_path  :
+        Input NIFTI File Path.
+    nii_ref_path    :
+        Reference NIFTI File Path.
+    nii_out_path
+        Resampled Output NIFTI File Path.
+    """
+    # resample CT to PET and mask resolution
+    input_image = nib.load(nii_input_path)
+    reference_image = nib.load(nii_ref_path)
+    resampled_image = resample_to_img(input_image, reference_image, fill_value=-1024)
+    nib.save(resampled_image, nii_out_path)
