@@ -74,3 +74,6 @@ The object detection and segmentation evaluation metrics can be computed and wit
 nndet_compute_metric_results --config-file /PATH/TO/CONFIG_FILE.json --output-dir /OUTPUT/PATH
 ```
 After the successful execution, the evaluation metrics will be written in an Excel Spreadsheet, together with the FROC PNG plots.
+
+A complete Summary Report of all the Experiments can be created following the
+Tutorial [nnDet_Report](nnDet_Report.ipynb)
