@@ -80,7 +80,7 @@ def get_arg_parser():
     )
 
     pars.add_argument(
-        "--training-config-file",
+        "--extra-training-config",
         type=str,
         required=False,
         help="Optional JSON file path with nnDetection training configuration.",
@@ -140,9 +140,9 @@ def run_training_step(config_file, folds, extra_params=None):
             str(fold),
         ]
         if extra_params is not None:
-            args.append("--overwrites")
             for parameter in extra_params:
-                args.append("{}={}".format(parameter, extra_params[parameter]))
+                args.append("{}".format(parameter))
+                args.append("{}".format(extra_params[parameter]))
 
         arg_list.append(args)
     return arg_list
@@ -181,8 +181,8 @@ def main():
     pipeline_steps.append(run_preprocessing_step(output_json_config_file))
 
     training_params = None
-    if arguments["training_config_file"] is not None:
-        with open(arguments["training_config_file"], "r") as f:
+    if arguments["extra_training_config"] is not None:
+        with open(arguments["extra_training_config"], "r") as f:
             training_params = json.load(f)
 
     [

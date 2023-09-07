@@ -37,6 +37,13 @@ def get_arg_parser():
     )
 
     pars.add_argument(
+        "--train-config",
+        type=str,
+        required=True,
+        help="File path for the nnDetection Training YAML configuration dictionary, used to configure the nnDetection Experiment.",
+    )
+
+    pars.add_argument(
         "--run-fold",
         type=str,
         default="0",
@@ -93,6 +100,8 @@ def main():
             data["Task_ID"],
             "-o",
             "exp.fold={}".format(args["run_fold"]),
+            "--train-config",
+            args["train_config"]
         ]
 
         if args["resume_training"]:
@@ -105,7 +114,7 @@ def main():
         os.environ["det_num_threads"] = os.environ["N_THREADS"]
         os.environ["nnUNet_def_n_proc"] = os.environ["N_THREADS"]
         os.environ["det_models"] = data["results_folder"]
-        os.environ["global_postprocessing_folder"] = data["preprocessing_folder"]
+        os.environ["global_preprocessing_folder"] = data["preprocessing_folder"]
 
         if int(args["run_fold"]) >= 0:
             subprocess.run(arguments)

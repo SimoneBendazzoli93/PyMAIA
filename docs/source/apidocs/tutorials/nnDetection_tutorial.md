@@ -40,13 +40,13 @@ export ROOT_FOLDER=/YOUR/PATH/TO/Experiments
 ```
 To generate the *Pipeline file*, run:
 ```
-Hive_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000
+nndet_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000
 ```
 with `task_id` representing an unique identifier number for the experiment. 
 
 Optionally, you can set the split ratio (in %, set a value between 0-100) between train and test data:
 ```
-Hive_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000 --test-split 20
+nndet_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000 --test-split 20
 ```
 
 By default, 80% of the available data will be dedicated for cross-fold validation, while 20% will be reserved as testing
@@ -55,6 +55,20 @@ set.
 The *Pipeline file* will be available, as a *txt* file, in `ROOT_FOLDER/experiment_folder`, with *experiment_folder* as
 indicated in the config file with the  `"Experiment Name"` attribute.
 
+The argument ``--extra_training_config`` in the ``nndet_create_pipeline`` command is used to provide extra arguments for
+the ``nndet_run_training`` step in the pipeline.
+For example, the file **extra_training_config** ( see below ), is passed as argument to set the nnDetection
+*RetinaUNetResidualV001_D3V001_3d* Model and the *residual_config.yaml* nnDetection Training configuration file:
+
+```json
+{
+  "--model": "RetinaUNetV001_D3V001_3d",
+  "--train-config": "residual_config.yaml"
+}
+```
+
+Check [Generate_nnDet_train_config](Generate_nnDet_train_config.ipynb) to learn how to create the nnDetection Training
+Configuration file.
 ## 3. Run Pipeline
 Once the *Pipeline file* is created, you are ready to run your nnDetection experiment, either with the available script, or by just copying/pasting the single commands from the *txt* file into your shell.
 To run the full pipeline with the **Hive** script:
