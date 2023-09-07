@@ -14,7 +14,7 @@ Hive Scripts
    Hive_convert_NIFTI_predictions_to_DICOM_SEG
 
 Hive Scripts for nnDetection
----------------
+-----------------------------
 .. toctree::
    :maxdepth: 1
 

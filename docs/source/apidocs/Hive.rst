@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 2
 
    Hive.utils
-   Hive.evaluation
 
 Module contents
 ---------------

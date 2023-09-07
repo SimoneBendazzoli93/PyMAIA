@@ -28,7 +28,7 @@ copyright = "2023, Simone Bendazzoli"
 author = "Simone Bendazzoli"
 
 # The full version, including alpha/beta/rc tags
-release = "1.1.1"
+release = Hive.__version__
 
 exclude_patterns = ["configs"]
 
@@ -70,6 +70,8 @@ extensions = [
     "sphinxcontrib.contentui",
     "sphinx.ext.autosectionlabel",
     "sphinx-jsonschema",
+    "nbsphinx",
+    "IPython.sphinxext.ipython_console_highlighting",
     "myst_parser",
 ]
 

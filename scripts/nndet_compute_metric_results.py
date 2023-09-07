@@ -11,9 +11,6 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 
-from Hive.evaluation.detection.coco import COCOMetric
-from Hive.evaluation.detection.froc import FROCMetric
-from Hive.evaluation.detection.hist import PredictionHistogram
 from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
 
 DESC = dedent(
@@ -148,6 +145,9 @@ def get_arg_parser():
 
 
 def main():
+    from nndet.evaluator.detection.coco import COCOMetric
+    from nndet.evaluator.detection.froc import FROCMetric
+    from nndet.evaluator.detection.hist import PredictionHistogram
     parser = get_arg_parser()
 
     arguments, unknown_arguments = parser.parse_known_args()

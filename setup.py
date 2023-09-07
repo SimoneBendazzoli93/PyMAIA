@@ -3,6 +3,8 @@ import os
 import setuptools
 from setuptools import setup
 
+import versioneer
+
 with open(os.path.join('VERSION')) as version_file:
     version = version_file.read().strip()
 
@@ -26,28 +28,17 @@ def read_file(file):
 
 
 setup(
-    name="hive-maia",
-    version=version,
-    url="https://github.com/MAIA-KTH/Hive.git",
-    license="GPLv3",
-    project_urls={
-        "Documentation": "https://hive-maia.readthedocs.io",
-        "Source": "https://github.com/MAIA-KTH/Hive",
-        "Tracker": "https://github.com/MAIA-KTH/Hive/issues",
-    },
-    author="Simone Bendazzoli",
-    author_email="simben@kth.se",
-    description="Python Package to support Deep Learning data preparation, pre-processing. training, result visualization"
-                " and model deployment across different frameworks (nnUNet, nnDetection, MONAI).",
-    long_description=read_file(os.path.join(os.path.dirname(__file__), "README.md")),
-    long_description_content_type="text/markdown",
+    version=versioneer.get_version(),
     packages=setuptools.find_packages(),
     package_data={
         "": ["configs/*.yml", "configs/*.json"],
     },
-    data_files=[('', ['VERSION', "requirements.txt"]), ],
+    zip_safe=False,
+    data_files=[('', ["requirements.txt"]), ],
     # package_dir={"": "src"},
-    install_requires=resolve_requirements(os.path.join(os.path.dirname(__file__), "requirements.txt")),
+    # install_requires=resolve_requirements(os.path.join(os.path.dirname(__file__), "requirements.txt")),
+
+    cmdclass=versioneer.get_cmdclass(),
     entry_points={
         "console_scripts": [
             "Hive_convert_DICOM_dataset_to_NIFTI_dataset = scripts.Hive_convert_DICOM_dataset_to_NIFTI_dataset:main",

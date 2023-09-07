@@ -4,6 +4,9 @@ sphinx-copybutton
 sphinxcontrib-contentui
 sphinx-jsonschema
 myst-parser
+pydata-sphinx-theme==0.13.3
+nbsphinx==0.9.2
+ipython
 pydata-sphinx-theme
 coloredlogs
 dicom2nifti
