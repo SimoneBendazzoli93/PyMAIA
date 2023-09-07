@@ -46,6 +46,29 @@ def get_arg_parser():
     )
 
     pars.add_argument(
+        "--run-validation-only",
+        type=str2bool,
+        default="no",
+        help="Flag to run only the Validation step ( after the Training step is completed). Default ``no``.",
+    )
+
+    pars.add_argument(
+        "--post-processing-folds",
+        type=str,
+        nargs="+",
+        required=False,
+        default="-1",
+        help="Trained Folds to include in the post-processing and model export. Default ``-1`` (All Folds are used).",
+    )
+
+    pars.add_argument(
+        "--output-model-file",
+        type=str,
+        required=True,
+        help="File Path where to save the zipped Model File.",
+    )
+
+    pars.add_argument(
         "--resume-training",
         type=str2bool,
         default="no",
@@ -96,8 +119,17 @@ def main():
 
         subprocess.run(arguments)
 
-        # subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres","-f","0"])
-        # subprocess.run(["nnUNetv2_export_model_to_zip","-d",data["Task_ID"],"-f","0","-c", "3d_fullres","-o","/home/BraTS_nnDet_3D_fullres.zip"])
+        if args["post_processing_folds"] != "-1":
+            subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres", "-f",
+                            args["post_processing_folds"]])
+            subprocess.run(["nnUNetv2_export_model_to_zip", "-d", data["Task_ID"], "--exp_cv_preds", "-f",
+                            args["post_processing_folds"], "-c", "3d_fullres", "-o", args["output_model_file"], "-tr",
+                            "nnUNetTrainerHive"])
+        else:
+            subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres"])
+            subprocess.run(
+                ["nnUNetv2_export_model_to_zip", "--exp_cv_preds", "-d", data["Task_ID"], "-c", "3d_fullres", "-o",
+                 args["output_model_file"], "-tr", "nnUNetTrainerHive"])
 
 
 if __name__ == "__main__":

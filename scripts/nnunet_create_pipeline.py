@@ -78,6 +78,13 @@ def get_arg_parser():
         help="Output TXT file path  where to save the pipeline steps.",
     )
 
+    pars.add_argument(
+        "--extra-training-config",
+        type=str,
+        required=False,
+        help="Optional JSON file path with nnUNet training configuration.",
+    )
+
     add_verbosity_options_to_argparser(pars)
 
     return pars
@@ -121,7 +128,7 @@ def run_preprocessing_step(config_file):
     return args
 
 
-def run_training_step(config_file, folds):
+def run_training_step(config_file, folds, extra_params=None):
     arg_list = []
     for fold in folds:
         args = [
@@ -131,6 +138,10 @@ def run_training_step(config_file, folds):
             "--run-fold",
             str(fold),
         ]
+        if extra_params is not None:
+            for parameter in extra_params:
+                args.append("{}".format(parameter))
+                args.append("{}".format(extra_params[parameter]))
         arg_list.append(args)
     return arg_list
 
@@ -167,11 +178,17 @@ def main():
     pipeline_steps.append(run_data_and_folder_preparation_step(arguments))
     pipeline_steps.append(run_preprocessing_step(output_json_config_file))
 
+    training_params = None
+    if arguments["extra_training_config"] is not None:
+        with open(arguments["extra_training_config"], "r") as f:
+            training_params = json.load(f)
+
     [
         pipeline_steps.append(step)
         for step in run_training_step(
         output_json_config_file,
-        list(range(config_dict["n_folds"]))
+        list(range(config_dict["n_folds"])),
+        extra_params=training_params,
     )
     ]
 
