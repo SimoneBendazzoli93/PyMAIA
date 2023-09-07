@@ -117,19 +117,21 @@ def main():
         os.environ["nnUNet_results"] = data["results_folder"]
         os.environ["nnUNet_def_n_proc"] = os.environ["N_THREADS"]
 
-        subprocess.run(arguments)
-
-        if args["post_processing_folds"] != "-1":
-            subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres", "-f",
-                            args["post_processing_folds"]])
-            subprocess.run(["nnUNetv2_export_model_to_zip", "-d", data["Task_ID"], "--exp_cv_preds", "-f",
-                            args["post_processing_folds"], "-c", "3d_fullres", "-o", args["output_model_file"], "-tr",
-                            "nnUNetTrainerHive"])
+        if str(args["run_fold"]) == "-1":
+            if args["post_processing_folds"] != "-1":
+                subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres", "-f",
+                                args["post_processing_folds"]])
+                subprocess.run(["nnUNetv2_export_model_to_zip", "-d", data["Task_ID"], "--exp_cv_preds", "-f",
+                                args["post_processing_folds"], "-c", "3d_fullres", "-o", args["output_model_file"],
+                                "-tr",
+                                "nnUNetTrainerHive"])
+            else:
+                subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres"])
+                subprocess.run(
+                    ["nnUNetv2_export_model_to_zip", "--exp_cv_preds", "-d", data["Task_ID"], "-c", "3d_fullres", "-o",
+                     args["output_model_file"], "-tr", "nnUNetTrainerHive"])
         else:
-            subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres"])
-            subprocess.run(
-                ["nnUNetv2_export_model_to_zip", "--exp_cv_preds", "-d", data["Task_ID"], "-c", "3d_fullres", "-o",
-                 args["output_model_file"], "-tr", "nnUNetTrainerHive"])
+            subprocess.run(arguments)
 
 
 if __name__ == "__main__":

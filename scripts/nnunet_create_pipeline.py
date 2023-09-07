@@ -187,7 +187,9 @@ def main():
         pipeline_steps.append(step)
         for step in run_training_step(
         output_json_config_file,
-        list(range(config_dict["n_folds"])),
+        list(range(config_dict["n_folds"])) + [
+            -1,
+        ],
         extra_params=training_params,
     )
     ]
