@@ -45,6 +45,22 @@ def get_arg_parser():
     )
 
     pars.add_argument(
+        "--n-folds",
+        type=str,
+        default="5",
+        required=False,
+        help="Number of Folds for final consolidation. Default: ``5``",
+    )
+
+    pars.add_argument(
+        "--model",
+        type=str,
+        default="RetinaUNetV001_D3V001_3d",
+        required=False,
+        help="nnDetection Model used for sweeping and consolidation. Default: ``RetinaUNetV001_D3V001_3d``",
+    )
+
+    pars.add_argument(
         "--resume-training",
         type=str2bool,
         default="no",
@@ -83,28 +99,29 @@ def main():
             arguments.append("train.mode=resume")
 
         arguments.extend(unknown_arguments)
+
         os.environ["det_data"] = data["base_folder"]
         os.environ["OMP_NUM_THREADS"] = "1"
         os.environ["det_num_threads"] = os.environ["N_THREADS"]
         os.environ["nnUNet_def_n_proc"] = os.environ["N_THREADS"]
         os.environ["det_models"] = data["results_folder"]
-
-        if "receiver_email" in data:
-            os.environ["receiver_email"] = data["receiver_email"]
+        os.environ["global_postprocessing_folder"] = data["preprocessing_folder"]
 
         if int(args["run_fold"]) >= 0:
             subprocess.run(arguments)
-            subprocess.run(["nndet_sweep", data["Task_ID"], "RetinaUNetV001_D3V001_3d", str(args["run_fold"])])
+            subprocess.run(["nndet_sweep", data["Task_ID"], args["model"], str(args["run_fold"])])
 
-        # subprocess.run(
-        #    ["nndet_eval", data["Task_ID"], "RetinaUNetV001_D3V001_3d", str(args['run_fold']), "--boxes", "--seg",
-        #     "--analyze_boxes"])
         else:
-            subprocess.run(["nndet_consolidate", data["Task_ID"], "RetinaUNetV001_D3V001_3d", "--sweep_boxes"])
             subprocess.run(
-                ["nndet_seg2nii", data["Task_ID"], "RetinaUNetV001_D3V001_3d", "--fold", str(args["run_fold"])])
+                ["nndet_consolidate", data["Task_ID"], args["model"], "--sweep_boxes", "--num_folds", args["n_folds"]])
             subprocess.run(
-                ["nndet_boxes2nii", data["Task_ID"], "RetinaUNetV001_D3V001_3d", "--fold", str(args["run_fold"])])
+                ["nndet_seg2nii", data["Task_ID"], args["model"], "--fold", str(args["run_fold"])])
+            subprocess.run(
+                ["nndet_boxes2nii", data["Task_ID"], args["model"], "--fold", str(args["run_fold"])])
+
+            subprocess.run(
+                ["nndet_eval", data["Task_ID"], args["model"], str(args["run_fold"]), "--boxes", "--seg",
+                 "--analyze_boxes"])
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from typing import Dict, List, Sequence
 
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import KFold
 
 from Hive.evaluation.detection.coco import COCOMetric
 from Hive.evaluation.detection.froc import FROCMetric
@@ -125,6 +126,22 @@ def get_arg_parser():
         help="Optional list of Subject Classes, to be considered for the class-wise result analysis.",
     )
 
+    pars.add_argument(
+        "--n-folds",
+        type=str,
+        default="1",
+        required=False,
+        help="Number of Folds used to aggregate subjects and create Object Detection metrics statistic.",
+    )
+
+    pars.add_argument(
+        "--model",
+        type=str,
+        default="RetinaUNetV001_D3V001_3d",
+        required=False,
+        help="nnDetection Model used for sweeping and consolidation. Default: ``RetinaUNetV001_D3V001_3d``",
+    )
+
     add_verbosity_options_to_argparser(pars)
 
     return pars
@@ -150,6 +167,7 @@ def main():
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
+    patients_classes_dict = None
     if args["class_file"] is not None and args["classes"] is not None:
         class_file = args["class_file"]
         patient_classes = args["classes"]
@@ -160,7 +178,7 @@ def main():
 
     if args["run_fold"] != "-1":
         results_folder = Path(data["results_folder"]).joinpath("Task{}_{}".format(data["Task_ID"], data["Task_Name"]),
-                                                               "RetinaUNetV001_D3V001_3d",
+                                                               args["model"],
                                                                "fold{}".format(args["run_fold"]),
                                                                "val_results"
                                                                )
@@ -168,7 +186,7 @@ def main():
     else:
         results_folder = Path(data["results_folder"]).joinpath(
             "Task{}_{}".format(data["Task_ID"], data["Task_Name"]),
-            "RetinaUNetV001_D3V001_3d",
+            args["model"],
             "consolidated",
             "val_results"
         )
@@ -182,10 +200,15 @@ def main():
     with open(seg_file, "rb") as file:
         patients_seg_dict = json.load(file)
 
-    df_seg = pd.DataFrame()
+    df_seg = []
     for patient in patients_seg_dict:
-        df_seg = df_seg.append({"Subject": patient, "Metric": "Dice", "Score": patients_seg_dict[patient]},
-                               ignore_index=True)
+        if patients_classes_dict is not None:
+            df_seg.append({"Subject": patient, "Metric": "Dice", "Score": patients_seg_dict[patient],
+                           "Class": patients_classes_dict[patient]})
+        else:
+            df_seg.append({"Subject": patient, "Metric": "Dice", "Score": patients_seg_dict[patient]})
+
+    df_seg = pd.DataFrame.from_records(df_seg)
 
     with open(boxes_metrics_file, "rb") as f:
         boxes_metrics = pickle.load(f)
@@ -226,21 +249,25 @@ def main():
 
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         filtered_boxes_metrics = []
-        for boxes_metric, id in zip(boxes_metrics, boxes_ids):
-            filtered_boxes_metrics.append(boxes_metric)
 
-        iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(froc)) for boxes_metric in
-                                filtered_boxes_metrics]
-        scores, curves = froc.compute(iou_filtered_results)
-
+        kf = KFold(n_splits=int(arguments["n_folds"]), random_state=1234567, shuffle=True)
         df = pd.DataFrame()
-        for score in scores:
-            df = df.append({"Metric": score, "Score": scores[score]}, ignore_index=True)
-        iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(coco)) for boxes_metric in
-                                filtered_boxes_metrics]
-        scores, _ = coco.compute(iou_filtered_results)
-        for score in scores:
-            df = df.append({"Metric": score, "Score": scores[score]}, ignore_index=True)
+        for i, (_, indexes) in enumerate(kf.split(list(range(len(boxes_metrics))))):
+            filtered_boxes_metrics = []
+            for idx in indexes:
+                filtered_boxes_metrics.append(boxes_metrics[idx])
+
+            iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(froc)) for boxes_metric in
+                                    filtered_boxes_metrics]
+            scores, curves = froc.compute(iou_filtered_results)
+
+            for score in scores:
+                df = df.append({"Metric": score, "Score": scores[score], "Group": i}, ignore_index=True)
+            iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(coco)) for boxes_metric in
+                                    filtered_boxes_metrics]
+            scores, _ = coco.compute(iou_filtered_results)
+            for score in scores:
+                df = df.append({"Metric": score, "Score": scores[score], "Group": i}, ignore_index=True)
 
         df.to_excel(writer, sheet_name="Object Detection")
 
@@ -249,7 +276,7 @@ def main():
         _, _ = histo.compute(iou_filtered_results)
     else:
         for class_name in patient_classes:
-
+            kf = KFold(n_splits=int(arguments["n_folds"]), random_state=1234567, shuffle=True)
             froc = FROCMetric(classes,
                               iou_thresholds=iou_thresholds,
                               fpi_thresholds=(1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8),
@@ -264,31 +291,36 @@ def main():
                                         )
 
             Path(output_dir).joinpath(class_name).mkdir(parents=True, exist_ok=True)
+
             filtered_boxes_metrics = []
             for boxes_metric, id in zip(boxes_metrics, boxes_ids):
                 if patients_classes_dict[id] == class_name:
                     filtered_boxes_metrics.append(boxes_metric)
-                # if class_name == "POSITIVE":
-                #    filtered_boxes_metrics.append(boxes_metric)
 
-            iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(froc)) for boxes_metric in
-                                    filtered_boxes_metrics]
-            scores, curves = froc.compute(iou_filtered_results)
+            for i, (_, indexes) in enumerate(kf.split(list(range(len(filtered_boxes_metrics))))):
+                fold_filtered_boxes_metrics = []
+                for idx in indexes:
+                    fold_filtered_boxes_metrics.append(filtered_boxes_metrics[idx])
 
-            df = pd.DataFrame()
-            for score in scores:
-                df = df.append({"Metric": score, "Score": scores[score]}, ignore_index=True)
-            iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(coco)) for boxes_metric in
-                                    filtered_boxes_metrics]
-            scores, _ = coco.compute(iou_filtered_results)
-            for score in scores:
-                df = df.append({"Metric": score, "Score": scores[score]}, ignore_index=True)
+                iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(froc)) for boxes_metric in
+                                        fold_filtered_boxes_metrics]
+                scores, curves = froc.compute(iou_filtered_results)
 
-            df.to_excel(writer, sheet_name="Object Detection-{}".format(class_name))
+                df = []
+                for score in scores:
+                    df.append({"Metric": score, "Score": scores[score], "Group": i})
 
-            iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(histo)) for boxes_metric in
-                                    filtered_boxes_metrics]
-            _, _ = histo.compute(iou_filtered_results)
+                iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(coco)) for boxes_metric in
+                                        fold_filtered_boxes_metrics]
+                scores, _ = coco.compute(iou_filtered_results)
+                for score in scores:
+                    df.append({"Metric": score, "Score": scores[score], "Group": i})
+                df = pd.DataFrame.from_records(df)
+                df.to_excel(writer, sheet_name="Object Detection-{}".format(class_name))
+
+                iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(histo)) for boxes_metric in
+                                        fold_filtered_boxes_metrics]
+                _, _ = histo.compute(iou_filtered_results)
 
     df_seg.to_excel(writer, sheet_name="Segmentation")
 
