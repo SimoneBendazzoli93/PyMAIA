@@ -24,3 +24,7 @@ os.environ["GPU_AVAILABLE"] = str(GPU_AVAILABLE)  # noqa: F405
 from . import _version
 
 __version__ = _version.get_versions()['version']
+
+from . import _version
+
+__version__ = _version.get_versions()['version']
