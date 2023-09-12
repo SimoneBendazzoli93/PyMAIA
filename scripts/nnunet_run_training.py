@@ -64,7 +64,7 @@ def get_arg_parser():
     pars.add_argument(
         "--output-model-file",
         type=str,
-        required=True,
+        required=False,
         help="File Path where to save the zipped Model File.",
     )
 
@@ -117,7 +117,7 @@ def main():
         os.environ["nnUNet_results"] = data["results_folder"]
         os.environ["nnUNet_def_n_proc"] = os.environ["N_THREADS"]
 
-        if str(args["run_fold"]) == "-1":
+        if str(args["run_fold"]) == "-1" and "output_model_file" in args:
             if args["post_processing_folds"] != "-1":
                 subprocess.run(["nnUNetv2_find_best_configuration", data["Task_ID"], "-c", "3d_fullres", "-f",
                                 args["post_processing_folds"]])

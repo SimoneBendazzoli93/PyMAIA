@@ -12,7 +12,7 @@ from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser,
 
 DESC = dedent(
     """
-    Script used to copy and save Experiment predictions, from the original experiment folder to the specified output folder.
+    Script used to copy and save nnDetection Experiment predictions, from the original experiment folder to the specified output folder.
     """  # noqa: E501 W291 W605
 )
 EPILOG = dedent(
