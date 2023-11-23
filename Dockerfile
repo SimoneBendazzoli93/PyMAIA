@@ -1,4 +1,4 @@
-FROM registry.maia.cloud.cbh.kth.se/nnunet:1.0
+FROM ${BASE_IMAGE}
 
 # GNU compiler
 RUN apt-get update -y && \
