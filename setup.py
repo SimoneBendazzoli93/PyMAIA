@@ -5,9 +5,6 @@ from setuptools import setup
 
 import versioneer
 
-with open(os.path.join('VERSION')) as version_file:
-    version = version_file.read().strip()
-
 
 def resolve_requirements(file):
     requirements = []
