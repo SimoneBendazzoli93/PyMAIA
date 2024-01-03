@@ -17,9 +17,6 @@ COPY requirements.txt \
     README.md \
     /opt/code/Hive/
 
-COPY ./docs/source/apidocs/configs/nnUNet_config_template.json \
-    /opt/code/Hive/docs/source/apidocs/configs/nnUNet_config_template.json
-
 COPY ./Hive/ \
     /opt/code/Hive/Hive/
 

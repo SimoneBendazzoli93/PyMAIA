@@ -250,8 +250,8 @@ def main():
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         filtered_boxes_metrics = []
 
-        kf = KFold(n_splits=int(arguments["n_folds"]), random_state=1234567, shuffle=True)
-        df = pd.DataFrame()
+        kf = KFold(n_splits=int(args["n_folds"]), random_state=1234567, shuffle=True)
+        df = []
         for i, (_, indexes) in enumerate(kf.split(list(range(len(boxes_metrics))))):
             filtered_boxes_metrics = []
             for idx in indexes:
@@ -262,12 +262,14 @@ def main():
             scores, curves = froc.compute(iou_filtered_results)
 
             for score in scores:
-                df = df.append({"Metric": score, "Score": scores[score], "Group": i}, ignore_index=True)
+                df = df.append({"Metric": score, "Score": scores[score], "Group": i})
             iou_filtered_results = [iou_filter(boxes_metric, iou_idx=get_indices_of_iou(coco)) for boxes_metric in
                                     filtered_boxes_metrics]
             scores, _ = coco.compute(iou_filtered_results)
             for score in scores:
-                df = df.append({"Metric": score, "Score": scores[score], "Group": i}, ignore_index=True)
+                df = df.append({"Metric": score, "Score": scores[score], "Group": i})
+
+        df = pd.DataFrame.from_records(df)
 
         df.to_excel(writer, sheet_name="Object Detection")
 
@@ -276,7 +278,7 @@ def main():
         _, _ = histo.compute(iou_filtered_results)
     else:
         for class_name in patient_classes:
-            kf = KFold(n_splits=int(arguments["n_folds"]), random_state=1234567, shuffle=True)
+            kf = KFold(n_splits=int(args["n_folds"]), random_state=1234567, shuffle=True)
             froc = FROCMetric(classes,
                               iou_thresholds=iou_thresholds,
                               fpi_thresholds=(1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8),
@@ -296,7 +298,7 @@ def main():
             for boxes_metric, id in zip(boxes_metrics, boxes_ids):
                 if patients_classes_dict[id] == class_name:
                     filtered_boxes_metrics.append(boxes_metric)
-
+            df = []
             for i, (_, indexes) in enumerate(kf.split(list(range(len(filtered_boxes_metrics))))):
                 fold_filtered_boxes_metrics = []
                 for idx in indexes:
@@ -306,7 +308,6 @@ def main():
                                         fold_filtered_boxes_metrics]
                 scores, curves = froc.compute(iou_filtered_results)
 
-                df = []
                 for score in scores:
                     df.append({"Metric": score, "Score": scores[score], "Group": i})
 

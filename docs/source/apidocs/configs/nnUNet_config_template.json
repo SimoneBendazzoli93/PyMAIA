@@ -20,7 +20,7 @@
     },
     "label_dict": {
       "type": "Dict[str,str]",
-      "description": "Dictionary describing the labels (excluding the background). The key-value pair contains the label value as key (starting from ``0``) and the label description as value. Example: \"0\": \"Background\""
+      "description": "Dictionary describing the labels (excluding the background). The key-value pair contains the label description as key and the label value as value (starting from 0). Example: \"Background\":0"
     },
     "n_folds": {
       "type": "integer",

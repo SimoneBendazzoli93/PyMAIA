@@ -23,10 +23,6 @@ From: /home/simone/nnDetection.sif
     MANIFEST.in /opt/code/Hive
     README.md /opt/code/Hive
 
-%setup
-    mkdir -p ${SINGULARITY_ROOTFS}/opt/code/Hive/docs/source/apidocs/configs
-%files
-    ./docs/source/apidocs/configs/nnDet_config_template.json /opt/code/Hive/docs/source/apidocs/configs
 
 %files
     ./Hive/ /opt/code/Hive
