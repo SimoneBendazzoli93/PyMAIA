@@ -13,6 +13,8 @@ COPY requirements.txt \
     versioneer.py \
     .gitattributes \
     setup.py \
+    main.py \
+    MLproject \
     MANIFEST.in \
     README.md \
     /opt/code/Hive/
@@ -22,6 +24,9 @@ COPY ./Hive/ \
 
 COPY ./scripts/* \
     /opt/code/Hive/scripts/
+
+COPY ./bundles/ \
+    /opt/code/Hive/bundles/
 
 WORKDIR /opt/code/Hive
 
