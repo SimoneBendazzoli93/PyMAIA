@@ -16,12 +16,12 @@
       "description": "File suffix (including file extension) of the files containing the label map. Example: \"_mask.nii.gz\""
     },
     "Modalities": {
-      "type": "Dict[str,str]",
+      "type": "object",
      "description": "Dictionary listing the input modalities. The key-value pair contains the file suffix as key and the modality name as value. Example: \"_image.nii.gz\": \"CT\""
 
     },
     "label_dict": {
-      "type": "Dict[str,str]",
+      "type": "object",
       "description": "Dictionary describing the labels (excluding the background). The key-value pair contains the label value as key (starting from ``0``) and the label description as value. Example: \"0\": \"ABD_Lymph_Node\""
     },
     "n_folds": {

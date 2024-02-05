@@ -1,0 +1,24 @@
+imports:
+  - $import subprocess
+
+data_dir: .
+task_id: ""
+hive_config_file: ""
+task_name: ""
+
+cmd:
+  - "nnunet_prepare_data_folder"
+  - "-i"
+  - '@data_dir'
+  - "--task-ID"
+  - '$str(@task_id)'
+  - "--task-name"
+  - '@task_name'
+  - "--test-split"
+  - "0"
+  - "--config-file"
+  - '@hive_config_file'
+
+prepare:
+  - '$print(@cmd)'
+  - '$subprocess.run(@cmd)'

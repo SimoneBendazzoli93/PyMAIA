@@ -1,0 +1,124 @@
+imports:
+  - $from bundle_scripts.trainer import get_nnunet_trainer
+  - $from bundle_scripts.trainer import prepare_nnunet_batch
+  - $import json
+  - $from pathlib import Path
+  - $import os
+  - $from ignite.contrib.handlers.tqdm_logger import ProgressBar
+  - $import shutil
+
+task_id: ""
+bundle_root: ""
+
+hive_config_file: ""
+hive_config_dict: "$json.load(open(@hive_config_file))"
+hive_config_file_final: "$str(Path(os.environ['ROOT_FOLDER']).joinpath(@hive_config_dict['Experiment Name'], @hive_config_dict['Experiment Name'] + '_results','Dataset' + str(@task_id) + '_' + @hive_config_dict['Experiment Name'] + '.json'))"
+nnunet_model_folder: "$str(Path(os.environ['ROOT_FOLDER']).joinpath(@hive_config_dict['Experiment Name'], @hive_config_dict['Experiment Name'] + '_results','Dataset' + str(@task_id) + '_' + @hive_config_dict['Experiment Name'],'nnUNetTrainerHive__nnUNetPlans__3d_fullres'))"
+
+nnunet_config:
+  device: "$torch.device('cuda')"
+  dataset_name_or_id: "@task_id"
+  configuration: "3d_fullres"
+  fold: 0
+  trainer_class_name: "nnUNetTrainer"
+  num_gpus: "1"
+  hive_config_file: "@hive_config_file_final"
+
+
+nnunet_trainer: "$get_nnunet_trainer(**@nnunet_config)"
+
+
+# Needed at Inference Time. See inference.yaml
+checkpoint:
+  init_args: '$@nnunet_trainer.my_init_kwargs'
+  trainer_name: '$@nnunet_trainer.__class__.__name__'
+  inference_allowed_mirroring_axes: '$@nnunet_trainer.inference_allowed_mirroring_axes'
+
+checkpoint_filename: "$@bundle_root+'/models/nnunet_checkpoint.pth'"
+
+postprocessing:
+  _target_: "Compose"
+  transforms:
+    - _target_: Lambdad
+      keys:
+        - "pred"
+        - "label"
+      func: "$lambda x: x[0]"
+    - _target_: Activationsd
+      keys:
+        - "pred"
+      softmax: True
+
+
+validation:
+  dataloader: "$@nnunet_trainer.dataloader_val"
+  pbar:
+    _target_: "ignite.contrib.handlers.tqdm_logger.ProgressBar"
+  key_metric:
+    Val_Dice:
+      _target_: "MeanDice"
+      output_transform: "$monai.handlers.from_engine(['pred', 'label'])"
+      reduction: "mean"
+  additional_metrics:
+    Val_Dice_per_class:
+      _target_: "MeanDice"
+      output_transform: "$monai.handlers.from_engine(['pred', 'label'])"
+      reduction: "mean_batch"
+
+train:
+  dataloader: "$@nnunet_trainer.dataloader_train"
+  pbar:
+    _target_: "ignite.contrib.handlers.tqdm_logger.ProgressBar"
+  key_metric:
+    Train_Dice:
+      _target_: "MeanDice"
+      output_transform: "$monai.handlers.from_engine(['pred', 'label'])"
+      reduction: "mean_batch"
+  handlers:
+    - _target_: "LrScheduleHandler"
+      lr_scheduler: "$@nnunet_trainer.lr_scheduler"
+    - _target_: "ValidationHandler"
+      interval: 1
+      validator: "$@validator"
+      exec_at_start: True
+    - _target_: "CheckpointSaver"
+      save_dir: "$@bundle_root+'/models'"
+      save_interval: 1
+      n_saved: 1
+      save_dict:
+        network_weights: '$@nnunet_trainer.network'
+        optimizer_state: '$@nnunet_trainer.optimizer'
+        scheduler: '$@nnunet_trainer.lr_scheduler'
+
+validator:
+  _target_: "SupervisedEvaluator"
+  postprocessing: "$@postprocessing"
+  device: "$@nnunet_trainer.device"
+  val_data_loader: "$@validation#dataloader"
+  network: "$@nnunet_trainer.network"
+  key_val_metric: "@validation#key_metric"
+  additional_metrics: "$@validation#additional_metrics"
+  epoch_length: "$int(@nnunet_trainer.num_val_iterations_per_epoch)"
+  prepare_batch: "$prepare_nnunet_batch"
+
+trainer:
+  _target_: "SupervisedTrainer"
+  postprocessing: "$@postprocessing"
+  device: "$@nnunet_trainer.device"
+  max_epochs: "$int(@nnunet_trainer.num_epochs)"
+  train_data_loader: "$@train#dataloader"
+  network: "$@nnunet_trainer.network"
+  key_train_metric: "@train#key_metric"
+  optimizer: "$@nnunet_trainer.optimizer"
+  loss_function: "$@nnunet_trainer.loss"
+  epoch_length: "$int(@nnunet_trainer.num_iterations_per_epoch)"
+  prepare_batch: "$prepare_nnunet_batch"
+  train_handlers: "$@train#handlers"
+
+run:
+  - "$@train#pbar.attach(@trainer,output_transform=lambda x: {'loss': x[0]['loss']})"
+  #- "$@validation#pbar.attach(@validator,metric_names=['Val_Dice'])"
+  - "$torch.save(@checkpoint,@checkpoint_filename)"
+  - "$shutil.copy(Path(@nnunet_model_folder).joinpath('dataset.json'), @bundle_root+'/models/dataset.json')"
+  - "$shutil.copy(Path(@nnunet_model_folder).joinpath('plans.json'), @bundle_root+'/models/plans.json')"
+  - "$@trainer.run()"
