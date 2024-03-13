@@ -63,7 +63,7 @@ def main():
             "-d",
             data["Task_ID"],
             "-c",
-            "3d_fullres"
+            "3d_fullres",
         ]
 
         os.environ["nnUNet_raw"] = str(Path(data["base_folder"]).joinpath("nnUNet_raw_data"))

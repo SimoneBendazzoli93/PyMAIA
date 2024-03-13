@@ -14,6 +14,7 @@ COPY requirements.txt \
     .gitattributes \
     setup.py \
     main.py \
+    inference.py \
     MLproject \
     MANIFEST.in \
     README.md \
@@ -22,7 +23,7 @@ COPY requirements.txt \
 COPY ./Hive/ \
     /opt/code/Hive/Hive/
 
-COPY ./scripts/* \
+COPY Hive_scripts/* \
     /opt/code/Hive/scripts/
 
 COPY ./bundles/ \

@@ -15,7 +15,7 @@ from Hive.utils.log_utils import (
 DESC = dedent(
     """
     Run nnDetection pre-processing, data analysis, and image data unpacking.
-    The CL scripts called are  ``nndet_prep`` and ``nndet_unpack``, with the arguments extracted from the given configuration file.
+    The CL Hive_scripts called are  ``nndet_prep`` and ``nndet_unpack``, with the arguments extracted from the given configuration file.
     """  # noqa: E501
 )
 EPILOG = dedent(

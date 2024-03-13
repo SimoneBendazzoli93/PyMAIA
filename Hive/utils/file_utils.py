@@ -293,6 +293,114 @@ def copy_label_file(input_image: Union[str, PathLike], input_label: Union[str, P
     nib.save(label_nib_out, output_filepath)
 
 
+def copy_data_from_dict_to_dataset_folder(
+        input_data_file: Union[str, PathLike],
+        step: str,
+        image_folder: Union[str, PathLike],
+        config_dict: Dict[str, object],
+        label_folder: Union[str, PathLike] = None,
+        num_threads: int = None,
+        save_label_instance_config: bool = False,
+):
+    """
+
+    Parameters
+    ----------
+
+    input_data_file :
+        JSON dict path of the input dataset
+    step :
+        string list for the step of the dataset (train/test).
+    image_folder :
+        folder path where to store images (imagesTr/imagesTs).
+    config_dict :
+        dictionary with dataset and experiment configuration parameters.
+    label_folder :
+        folder path where to store labels (labelsTr/labelsTs). Default: ``None``.
+        If **label_suffix** is ``None``, the label files are not saved.
+    num_threads :
+        number of threads to use in multiprocessing ( Default: ``os.environ['N_THREADS']`` )
+    save_label_instance_config :
+        Flag to save label mask together with an instance dictionary as JSON file. NOTE: All the instances are assigned
+         to instance class ``1``.
+    """
+    label_suffix = str(config_dict["label_suffix"])
+    if num_threads is None:
+        try:
+            num_threads = int(os.environ["N_THREADS"])
+        except KeyError:
+            logger.warning("N_THREADS is not set as environment variable. Using Default [1]")
+            num_threads = 1
+
+    with open(input_data_file, "r") as file:
+        input_data_dict = json.load(file)
+
+    pool = Pool(num_threads)
+    copied_files = []
+    for subject in input_data_dict[step]:
+
+        image_suffix_list = config_dict["Modalities"].keys()
+
+        for modality, image_suffix in enumerate(image_suffix_list):
+            modality_code = "_{0:04d}".format(modality)
+            image_filename = subject[config_dict["Modalities"][image_suffix]]
+
+            if Path(image_filename).is_file():
+                updated_image_filename = Path(image_filename).name.replace(image_suffix,
+                                                                           modality_code + str(
+                                                                               config_dict["FileExtension"]))
+                copied_files.append(
+                    pool.starmap_async(
+                        copy_image_file,
+                        (
+                            (
+                                str(image_filename),
+                                str(Path(image_folder).joinpath(updated_image_filename)),
+                            ),
+                        ),
+                    )
+                )
+            else:
+                logger.warning("{} is not found: skipping {} case".format(image_filename, image_filename))
+        if "label" in subject and label_suffix is not None:
+
+            label_filename = subject["label"]
+
+            if Path(label_filename).is_file():
+
+                updated_label_filename = Path(label_filename).name.replace(label_suffix,
+                                                                           str(config_dict["FileExtension"]))
+
+                copied_files.append(
+                    pool.starmap_async(
+                        copy_label_file,
+                        (
+                            (
+                                str(image_filename),
+                                str(label_filename),
+                                str(Path(label_folder).joinpath(updated_label_filename)),
+                            ),
+                        ),
+                    )
+                )
+                if save_label_instance_config:
+                    label_map = SimpleITK.GetArrayFromImage(
+                        SimpleITK.ReadImage(str(Path(label_filename)))
+                    )
+                    instances = np.unique(label_map)
+                    instances = instances[instances > 0]
+
+                    json_dict = {
+                        "instances": {str(int(i)): 0 for i in instances},
+                    }
+                    save_config_json(json_dict,
+                                     str(Path(label_folder).joinpath(
+                                         Path(label_filename).name.replace(label_suffix, ".json"))))
+            else:
+                logger.warning("{} is not found: skipping {} case".format(label_filename, label_filename))
+
+    _ = [i.get() for i in tqdm(copied_files)]
+
 def copy_data_to_dataset_folder(
         input_data_folder: Union[str, PathLike],
         subjects: List[str],

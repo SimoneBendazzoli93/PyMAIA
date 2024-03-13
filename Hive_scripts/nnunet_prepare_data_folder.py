@@ -17,6 +17,7 @@ from Hive.utils.file_utils import (
     create_nnunet_data_folder_tree,
     split_dataset,
     copy_data_to_dataset_folder,
+    copy_data_from_dict_to_dataset_folder,
     save_config_json,
     generate_dataset_json,
 )
@@ -94,8 +95,22 @@ def main():
         arguments["task_ID"],
     )
 
-    train_dataset, test_dataset = split_dataset(arguments["input_data_folder"], arguments["test_split"],
-                                                config_dict["Seed"])
+    if Path(arguments["input_data_folder"]).is_file() and arguments["input_data_folder"].endswith(".json"):
+        with open(arguments["input_data_folder"]) as json_file:
+            dataset_dict = json.load(json_file)
+            train_dataset = dataset_dict["train"]
+            train_dataset = [Path(train_id[list(config_dict["Modalities"].values())[0]]).name[
+                             :-len(list(config_dict["Modalities"].keys())[0])] for train_id in train_dataset]
+            if "test" in dataset_dict:
+                test_dataset = dataset_dict["test"]
+                test_dataset = [Path(test_id[list(config_dict["Modalities"].values())[0]]).name[
+                                :-len(list(config_dict["Modalities"].keys())[0])] for test_id in test_dataset]
+
+            else:
+                test_dataset = []
+    else:
+        train_dataset, test_dataset = split_dataset(arguments["input_data_folder"], arguments["test_split"],
+                                                    config_dict["Seed"])
 
     dataset_split = []
     for test_subject in test_dataset:
@@ -119,22 +134,42 @@ def main():
         for data in dataset_split:
             writer.writerow(data)
 
-    config_dict["dataset_folder"] = Path(arguments["input_data_folder"]).stem.replace("_", " ")
+    if Path(arguments["input_data_folder"]).is_file() and arguments["input_data_folder"].endswith(".json"):
+        config_dict["dataset_folder"] = str(Path(arguments["input_data_folder"]))
+    else:
+        config_dict["dataset_folder"] = str(Path(arguments["input_data_folder"]))
 
-    copy_data_to_dataset_folder(
-        arguments["input_data_folder"],
-        train_dataset,
-        Path(dataset_path).joinpath("imagesTr"),
-        config_dict,
-        Path(dataset_path).joinpath("labelsTr")
-    )
-    copy_data_to_dataset_folder(
-        arguments["input_data_folder"],
-        test_dataset,
-        Path(dataset_path).joinpath("imagesTs"),
-        config_dict,
-        Path(dataset_path).joinpath("labelsTs")
-    )
+    if Path(arguments["input_data_folder"]).is_file() and arguments["input_data_folder"].endswith(".json"):
+        copy_data_from_dict_to_dataset_folder(
+            arguments["input_data_folder"],
+            "train",
+            Path(dataset_path).joinpath("imagesTr"),
+            config_dict,
+            Path(dataset_path).joinpath("labelsTr"),
+
+        )
+        copy_data_from_dict_to_dataset_folder(
+            arguments["input_data_folder"],
+            "test",
+            Path(dataset_path).joinpath("imagesTs"),
+            config_dict,
+            Path(dataset_path).joinpath("labelsTs"),
+        )
+    else:
+        copy_data_to_dataset_folder(
+            arguments["input_data_folder"],
+            train_dataset,
+            Path(dataset_path).joinpath("imagesTr"),
+            config_dict,
+            Path(dataset_path).joinpath("labelsTr")
+        )
+        copy_data_to_dataset_folder(
+            arguments["input_data_folder"],
+            test_dataset,
+            Path(dataset_path).joinpath("imagesTs"),
+            config_dict,
+            Path(dataset_path).joinpath("labelsTs")
+        )
 
     generate_dataset_json(
         str(

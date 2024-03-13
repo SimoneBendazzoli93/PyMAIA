@@ -102,7 +102,7 @@ def main():
             "3d_fullres",
             str(args["run_fold"]),
             "-tr",
-            "nnUNetTrainerHive"
+            "nnUNetTrainer"
         ]
         if args["run_validation_only"]:
             arguments.append("--val")

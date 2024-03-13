@@ -14,6 +14,7 @@ Stage0 += copy(src=[
     '.gitattributes',
     'setup.py',
     'main.py',
+    'inference.py',
     # 'ensemble_main.py',
     'MANIFEST.in',
     'README.md'
@@ -23,7 +24,7 @@ Stage0 += copy(src=[
 Stage0 += copy(src=[
     './bundles/'], dest='/opt/code/Hive/bundles/')
 Stage0 += copy(src=[
-    './scripts/'], dest='/opt/code/Hive/scripts/')
+    './Hive_scripts/'], dest='/opt/code/Hive/Hive_scripts/')
 Stage0 += workdir(directory="/opt/code/Hive")
 Stage0 += pip(ospackages=[""], packages=["/opt/code/Hive"])
 Stage0 += runscript(commands=[''])
