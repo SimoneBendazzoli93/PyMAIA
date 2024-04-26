@@ -15,7 +15,7 @@ import pydicom
 import pydicom_seg
 from tqdm import tqdm
 
-from Hive.utils.log_utils import get_logger, DEBUG, WARN, INFO
+from PyMAIA.utils.log_utils import get_logger, DEBUG, WARN, INFO
 
 logger = get_logger(__name__)
 
@@ -90,22 +90,27 @@ def create_nnunet_data_folder_tree(data_folder: str, task_name: str, task_id: st
 
     nnUnet folder tree:
 
-        ${raw_data_base}
+        [raw_data_base]
 
         [Dataset000_Example]
             - dataset.yaml # dataset.json works too
+            
             [imagesTr]
                 - case0000_0000.nii.gz # case0000 modality 0
                 - case0000_0001.nii.gz # case0000 modality 1
                 - case0001_0000.nii.gz # case0001 modality 0
                 - case0000_0001.nii.gz # case0001 modality 1
+                
             [labelsTr]
                 - case0000.nii.gz # instance segmentation case0000
                 - case0000.json # properties of case0000
                 - case0001.nii.gz # instance segmentation case0001
                 - case0001.json # properties of case0001
+                
             [imagesTs] # optional, same structure as imagesTr
+            
             ...
+            
             [labelsTs] # optional, same structure as labelsTr
 
         [Dataset001_Example1]
@@ -150,27 +155,34 @@ def create_nndet_data_folder_tree(data_folder: Union[str, PathLike], task_name: 
 
     nnDetection folder tree:
 
-        ${raw_data_base}
+        [raw_data_base]
 
         [Task000_Example]
             - dataset.yaml # dataset.json works too
+
             [raw_splitted]
                 [imagesTr]
                     - case0000_0000.nii.gz # case0000 modality 0
                     - case0000_0001.nii.gz # case0000 modality 1
                     - case0001_0000.nii.gz # case0001 modality 0
                     - case0000_0001.nii.gz # case0001 modality 1
+
                 [labelsTr]
                     - case0000.nii.gz # instance segmentation case0000
                     - case0000.json # properties of case0000
                     - case0001.nii.gz # instance segmentation case0001
                     - case0001.json # properties of case0001
+
                 [imagesTs] # optional, same structure as imagesTr
                 ...
+
                 [labelsTs] # optional, same structure as labelsTr
                 ...
+
             [preprocessed]
+
             [results]
+
         [Task001_Example1]
             ...
 
@@ -559,6 +571,7 @@ def generate_dataset_json(
         labels: Union[Dict, List],
         task_name: str,
         file_extension: str,
+        region_class_order=None,
         nnunet_format: bool = False,
 ):
     """
@@ -587,6 +600,8 @@ def generate_dataset_json(
         the dictionaries for each label task are nested into a list.
     task_name :
         The name of the dataset.
+    region_class_order :
+        Optional list of strings with the region class order, used for region-based training. Default: ``None``.
     """
     modality_key = "modalities"
     if nnunet_format:
@@ -605,6 +620,8 @@ def generate_dataset_json(
         "test": ["./imagesTs/%s.nii.gz" % i for i in test_subjects],
         "file_ending": file_extension,
     }
+    if region_class_order:
+        json_dict["regions_class_order"] = region_class_order
 
     if not str(output_file).endswith("dataset.json"):
         print(

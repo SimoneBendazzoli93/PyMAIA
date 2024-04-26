@@ -5,8 +5,8 @@ import sys
 from argparse import ArgumentParser, RawTextHelpFormatter
 from textwrap import dedent
 
-from Hive.utils.file_utils import order_data_in_single_folder, order_data_folder_by_patient
-from Hive.utils.log_utils import (
+from PyMAIA.utils.file_utils import order_data_in_single_folder, order_data_folder_by_patient
+from PyMAIA.utils.log_utils import (
     get_logger,
     log_lvl_from_verbosity_args,
     add_verbosity_options_to_argparser,

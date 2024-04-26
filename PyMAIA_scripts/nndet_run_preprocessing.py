@@ -6,7 +6,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 from textwrap import dedent
 
-from Hive.utils.log_utils import (
+from PyMAIA.utils.log_utils import (
     get_logger,
     add_verbosity_options_to_argparser,
     log_lvl_from_verbosity_args,
@@ -15,7 +15,7 @@ from Hive.utils.log_utils import (
 DESC = dedent(
     """
     Run nnDetection pre-processing, data analysis, and image data unpacking.
-    The CL Hive_scripts called are  ``nndet_prep`` and ``nndet_unpack``, with the arguments extracted from the given configuration file.
+    The CL PyMAIA_scripts called are  ``nndet_prep`` and ``nndet_unpack``, with the arguments extracted from the given configuration file.
     """  # noqa: E501
 )
 EPILOG = dedent(
@@ -62,6 +62,9 @@ def main():
         level=log_lvl_from_verbosity_args(args),
     )
     config_file = args["config_file"]
+
+    if not "N_THREADS" in os.environ:
+        os.environ["N_THREADS"] = str(os.cpu_count())
 
     n_workers = "1"
     if args["n_workers"] is None:

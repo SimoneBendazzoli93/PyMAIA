@@ -10,9 +10,9 @@ from textwrap import dedent
 
 from tqdm import tqdm
 
-from Hive.utils.file_utils import subfolders
-from Hive.utils.log_utils import add_verbosity_options_to_argparser, get_logger, log_lvl_from_verbosity_args
-from Hive.utils.volume_utils import convert_DICOM_folder_to_NIFTI_image
+from PyMAIA.utils.file_utils import subfolders
+from PyMAIA.utils.log_utils import add_verbosity_options_to_argparser, get_logger, log_lvl_from_verbosity_args
+from PyMAIA.utils.volume_utils import convert_DICOM_folder_to_NIFTI_image
 
 TIMESTAMP = "{:%Y-%m-%d_%H-%M-%S}".format(datetime.datetime.now())
 

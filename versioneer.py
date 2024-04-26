@@ -235,8 +235,8 @@ Versioneer-0.16 and earlier only looked for a `.git` directory next to the
 project into a virtualenv once, then continue editing the source code (and
 test) without re-installing after every change.
 
-"Entry-point Hive_scripts" (`setup(entry_points={"console_scripts": ..})`) are a
-convenient way to specify executable Hive_scripts that should be installed along
+"Entry-point PyMAIA_scripts" (`setup(entry_points={"console_scripts": ..})`) are a
+convenient way to specify executable PyMAIA_scripts that should be installed along
 with the python package.
 
 These both work as expected when using modern setuptools. When using
@@ -276,7 +276,7 @@ will take a VCS name as an argument, and will construct a version of
 configuration arguments that are currently provided manually during
 installation by editing setup.py . Alternatively, it might go the other
 direction and include code from all supported VCS systems, reducing the
-number of intermediate Hive_scripts.
+number of intermediate PyMAIA_scripts.
 
 ## Similar projects
 

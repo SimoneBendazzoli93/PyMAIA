@@ -12,15 +12,15 @@ from textwrap import dedent
 import numpy as np
 from sklearn.model_selection import KFold
 
-import Hive.configs
-from Hive.utils.file_utils import (
+import PyMAIA.configs
+from PyMAIA.utils.file_utils import (
     create_nndet_data_folder_tree,
     split_dataset,
     copy_data_to_dataset_folder,
     save_config_json,
     generate_dataset_json,
 )
-from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
+from PyMAIA.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
 
 TIMESTAMP = "{:%Y-%m-%d_%H-%M-%S}".format(datetime.datetime.now())
 
@@ -58,7 +58,7 @@ def main():
         with open(arguments["config_file"]) as json_file:
             config_dict = json.load(json_file)
     except FileNotFoundError:
-        with importlib.resources.path(Hive.configs, arguments["config_file"]) as json_path:
+        with importlib.resources.path(PyMAIA.configs, arguments["config_file"]) as json_path:
             with open(json_path) as json_file:
                 config_dict = json.load(json_file)
 

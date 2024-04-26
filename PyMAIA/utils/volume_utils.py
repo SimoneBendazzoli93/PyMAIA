@@ -11,11 +11,12 @@ import dicom2nifti
 import nibabel as nib
 import numpy as np
 import pydicom
+import pydicom_seg
 from nilearn.image import resample_to_img
 from pydicom import dcmread
 
-from Hive.utils.file_utils import subfolders
-from Hive.utils.log_utils import get_logger
+from PyMAIA.utils.file_utils import subfolders
+from PyMAIA.utils.log_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -38,6 +39,33 @@ def dcm2nii_CT(CT_dcm_path: Union[str, PathLike], nii_out_path: Union[str, PathL
         nii = next(tmp.glob("*nii.gz"))
         shutil.copy(nii, nii_out_path)
 
+
+def dcm2nii_seg(mask_dcm_path: Union[str, PathLike], nii_out_path: Union[str, PathLike], ref_nii_path: Union[str]):
+    """
+    Conversion of SEG DICOM to NIFTI, using a reference NIFTI image.
+
+    Parameters
+    ----------
+    mask_dcm_path :
+        SEG DICOM folder.
+    nii_out_path :
+        NIFTI file saved as output.
+    ref_nii_path :
+        Reference NIFTI used to correctly saved the segmentation volume.
+    """
+    dcm = pydicom.dcmread(mask_dcm_path)
+
+    reader = pydicom_seg.MultiClassReader()
+    result = reader.read(dcm)
+
+    image_data = result.data  # directly available
+    image = result.image  # lazy construction
+    sitk.WriteImage(image, nii_out_path, True)
+
+    input_image = nib.load(nii_out_path)
+    reference_image = nib.load(ref_nii_path)
+    resampled_image = resample_to_img(input_image, reference_image, fill_value=0)
+    nib.save(resampled_image, nii_out_path)
 
 def dcm2nii_mask(mask_dcm_path: Union[str, PathLike], nii_out_path: Union[str, PathLike], ref_nii_path: Union[str, PathLike]):
     """

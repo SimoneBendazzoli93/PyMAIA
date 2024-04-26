@@ -14,8 +14,8 @@ import os
 import subprocess
 import sys
 
-sys.path.insert(0, os.path.abspath("../../Hive_scripts"))
-sys.path.insert(0, os.path.abspath("../../Hive"))
+sys.path.insert(0, os.path.abspath("../../PyMAIA_scripts"))
+sys.path.insert(0, os.path.abspath("../../PyMAIA"))
 sys.path.insert(0, os.path.abspath(".."))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
@@ -23,20 +23,21 @@ print(sys.path)
 
 # -- Project information -----------------------------------------------------
 
-project = "Hive"
+project = "PyMAIA"
 copyright = "2023, Simone Bendazzoli"
 author = "Simone Bendazzoli"
 
+import PyMAIA
 # The full version, including alpha/beta/rc tags
-release = Hive.__version__
+release = PyMAIA.__version__
 
 exclude_patterns = ["configs"]
 
 
 def generate_apidocs(*args):
     """Generate API docs automatically by trawling the available modules"""
-    module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "Hive"))
-    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "Hive_scripts"))
+    module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "PyMAIA"))
+    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "PyMAIA_scripts"))
     output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "apidocs"))
     apidoc_command_path = "sphinx-apidoc"
     if hasattr(sys, "real_prefix"):  # called from a virtualenv

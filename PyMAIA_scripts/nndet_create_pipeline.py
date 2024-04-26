@@ -9,8 +9,8 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 from textwrap import dedent
 
-import Hive.configs
-from Hive.utils.log_utils import (
+import PyMAIA.configs
+from PyMAIA.utils.log_utils import (
     get_logger,
     add_verbosity_options_to_argparser,
     log_lvl_from_verbosity_args,
@@ -96,7 +96,7 @@ def run_data_and_folder_preparation_step(arguments):
         with open(arguments["config_file"]) as json_file:
             config_dict = json.load(json_file)
     except FileNotFoundError:
-        with importlib.resources.path(Hive.configs, arguments["config_file"]) as json_path:
+        with importlib.resources.path(PyMAIA.configs, arguments["config_file"]) as json_path:
             with open(json_path) as json_file:
                 config_dict = json.load(json_file)
 
@@ -161,7 +161,7 @@ def main():
         with open(arguments["config_file"]) as json_file:
             config_dict = json.load(json_file)
     except FileNotFoundError:
-        with importlib.resources.path(Hive.configs, arguments["config_file"]) as json_path:
+        with importlib.resources.path(PyMAIA.configs, arguments["config_file"]) as json_path:
             with open(json_path) as json_file:
                 config_dict = json.load(json_file)
 
@@ -173,6 +173,9 @@ def main():
             "results",
         )
     )
+    if "N_THREADS" not in os.environ:
+        os.environ["N_THREADS"] = str(os.cpu_count())
+
     output_json_config_file = str(Path(os.environ["RESULTS_FOLDER"]).joinpath(output_json_config_filename))
 
     pipeline_steps = []

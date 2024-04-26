@@ -7,7 +7,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 from textwrap import dedent
 
-from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args, str2bool
+from PyMAIA.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args, str2bool
 
 DESC = dedent(
     """
@@ -74,6 +74,13 @@ def get_arg_parser():
         help="Flag to indicate training resume after stopping it. Default ``no``.",
     )
 
+    pars.add_argument(
+        "--n-workers",
+        type=str,
+        default=None,
+        help="Number of parallel processes used when pre-processing and unpacking the image data (Default: ``N_THREADS``)",
+    )
+
     add_verbosity_options_to_argparser(pars)
 
     return pars
@@ -105,14 +112,24 @@ def main():
         ]
 
         if args["resume_training"]:
+            arguments.append("-o")
             arguments.append("train.mode=resume")
 
         arguments.extend(unknown_arguments)
 
+        if not "N_THREADS" in os.environ:
+            os.environ["N_THREADS"] = str(os.cpu_count())
+        n_workers = "1"
+        if args["n_workers"] is None:
+            if "N_THREADS" in os.environ is not None:
+                n_workers = str(os.environ["N_THREADS"])
+        else:
+            n_workers = str(args["n_workers"])
+
         os.environ["det_data"] = data["base_folder"]
         os.environ["OMP_NUM_THREADS"] = "1"
-        os.environ["det_num_threads"] = os.environ["N_THREADS"]
-        os.environ["nnUNet_def_n_proc"] = os.environ["N_THREADS"]
+        os.environ["det_num_threads"] = n_workers
+        os.environ["nnUNet_def_n_proc"] = n_workers
         os.environ["det_models"] = data["results_folder"]
         os.environ["global_preprocessing_folder"] = data["preprocessing_folder"]
 

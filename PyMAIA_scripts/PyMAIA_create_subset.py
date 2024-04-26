@@ -8,7 +8,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 from textwrap import dedent
 
-from Hive.utils.log_utils import add_verbosity_options_to_argparser
+from PyMAIA.utils.log_utils import add_verbosity_options_to_argparser
 
 TIMESTAMP = "{:%Y-%m-%d_%H-%M-%S}".format(datetime.datetime.now())
 

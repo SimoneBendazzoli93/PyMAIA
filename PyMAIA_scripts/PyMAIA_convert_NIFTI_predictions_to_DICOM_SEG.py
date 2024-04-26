@@ -10,9 +10,9 @@ from textwrap import dedent
 
 from tqdm import tqdm
 
-from Hive.utils.file_utils import convert_nifti_pred_to_dicom_seg
-from Hive.utils.file_utils import subfolders
-from Hive.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
+from PyMAIA.utils.file_utils import convert_nifti_pred_to_dicom_seg
+from PyMAIA.utils.file_utils import subfolders
+from PyMAIA.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
 
 if "N_THREADS" not in os.environ:
     os.environ["N_THREADS"] = "1"
