@@ -1,3 +1,4 @@
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 # GNU compiler
@@ -7,6 +8,12 @@ RUN apt-get update -y && \
         gcc \
         gfortran && \
     rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libgl1 && \
+    rm -rf /var/lib/apt/lists/*
+
 
 COPY requirements.txt \
     setup.cfg \
@@ -18,25 +25,25 @@ COPY requirements.txt \
     MLproject \
     MANIFEST.in \
     README.md \
-    /opt/code/Hive/
+    /opt/code/PyMAIA/
 
-COPY ./Hive/ \
-    /opt/code/Hive/Hive/
+COPY PyMAIA/ \
+    /opt/code/PyMAIA/PyMAIA/
 
-COPY Hive_scripts/* \
-    /opt/code/Hive/scripts/
+COPY PyMAIA_scripts/* \
+    /opt/code/PyMAIA/PyMAIA_scripts/
 
 COPY ./bundles/ \
-    /opt/code/Hive/bundles/
+    /opt/code/PyMAIA/bundles/
 
-WORKDIR /opt/code/Hive
+WORKDIR /opt/code/PyMAIA
 
 # pip
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          && \
     rm -rf /var/lib/apt/lists/*
-RUN pip --no-cache-dir install -e /opt/code/Hive
+RUN pip --no-cache-dir install -e /opt/code/PyMAIA
 
 ENTRYPOINT []
 

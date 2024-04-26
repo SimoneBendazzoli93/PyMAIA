@@ -1,4 +1,5 @@
 BootStrap: docker
+#From: nvcr.io/nvidia/pytorch:23.04-py3
 From: rocm/pytorch:rocm5.4_ubuntu20.04_py3.8_pytorch_1.12.1
 %post
     . /.singularity.d/env/10-docker*.sh
@@ -20,7 +21,7 @@ From: rocm/pytorch:rocm5.4_ubuntu20.04_py3.8_pytorch_1.12.1
     rm -rf /var/lib/apt/lists/*
 %post
     cd /
-    pip --no-cache-dir install "monai[nibabel, skimage, scipy, pillow, tensorboard, gdown, ignite, torchvision, itk, tqdm, pandas, mlflow, matplotlib, pydicom]" fire
+    pip --no-cache-dir install "monai[nibabel, skimage, scipy, pillow, tensorboard, gdown, ignite, torchvision, itk, tqdm, pandas, mlflow, matplotlib, pydicom]" fire jupyter einops jupyterlab lightning==2.1.4
 
 %runscript
     exec  "$@"

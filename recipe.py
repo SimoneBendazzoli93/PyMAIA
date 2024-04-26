@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import hpccm
 
-hpccm.config.set_working_directory('/opt/code/Hive')
+hpccm.config.set_working_directory('/opt/code/PyMAIA')
 
 Stage0 += baseimage(image='')
 Stage0 += gnu()
-
+Stage0 += apt_get(ospackages=['libgl1'])
 Stage0 += copy(src=[
     'requirements.txt',
     'MLproject',
@@ -18,13 +18,13 @@ Stage0 += copy(src=[
     # 'ensemble_main.py',
     'MANIFEST.in',
     'README.md'
-], dest='/opt/code/Hive', _mkdir=True)
+], dest='/opt/code/PyMAIA', _mkdir=True)
 Stage0 += copy(src=[
-    './Hive/'], dest='/opt/code/Hive/Hive/')
+    './PyMAIA/'], dest='/opt/code/PyMAIA/PyMAIA/')
 Stage0 += copy(src=[
-    './bundles/'], dest='/opt/code/Hive/bundles/')
+    './bundles/'], dest='/opt/code/PyMAIA/bundles/')
 Stage0 += copy(src=[
-    './Hive_scripts/'], dest='/opt/code/Hive/Hive_scripts/')
-Stage0 += workdir(directory="/opt/code/Hive")
-Stage0 += pip(ospackages=[""], packages=["/opt/code/Hive"])
+    './PyMAIA_scripts/'], dest='/opt/code/PyMAIA/PyMAIA_scripts/')
+Stage0 += workdir(directory="/opt/code/PyMAIA")
+Stage0 += pip(ospackages=[""], packages=["/opt/code/PyMAIA"])
 Stage0 += runscript(commands=[''])

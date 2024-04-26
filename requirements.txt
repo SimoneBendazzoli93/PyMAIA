@@ -16,3 +16,4 @@ pandas
 openpyxl
 mlflow
 monai
+pyjwt
