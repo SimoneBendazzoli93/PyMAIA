@@ -1,20 +1,20 @@
 Scripts
 =======================
 
-Hive Scripts
+PyMAIA Scripts
 ---------------
 .. toctree::
    :maxdepth: 1
 
-   Hive_convert_DICOM_dataset_to_NIFTI_dataset
-   Hive_run_pipeline_from_file
-   Hive_convert_semantic_to_instance_segmentation
-   Hive_create_subset
-   Hive_order_data_folder
-   Hive_convert_NIFTI_predictions_to_DICOM_SEG
+   PyMAIA_convert_DICOM_dataset_to_NIFTI_dataset
+   PyMAIA_run_pipeline_from_file
+   PyMAIA_convert_semantic_to_instance_segmentation
+   PyMAIA_create_subset
+   PyMAIA_order_data_folder
+   PyMAIA_convert_NIFTI_predictions_to_DICOM_SEG
 
-Hive Scripts for nnDetection
------------------------------
+PyMAIA Scripts for nnDetection
+-------------------------------
 .. toctree::
    :maxdepth: 1
 
@@ -22,7 +22,19 @@ Hive Scripts for nnDetection
    nndet_prepare_data_folder
    nndet_run_preprocessing
    nndet_run_training
-   Hive_extract_experiment_predictions
+   nndet_extract_experiment_predictions
    nndet_compute_metric_results
+
+
+PyMAIA Scripts for nnUNet
+-----------------------------
+.. toctree::
+   :maxdepth: 1
+
+   nnunet_create_pipeline
+   nnunet_prepare_data_folder
+   nnunet_run_preprocessing
+   nnunet_run_plan_and_preprocessing
+   nnunet_run_training
 
 

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Hive documentation!
+Welcome to PyMAIA documentation!
 ==================================
 
 .. include:: ../../README.md
@@ -13,7 +13,7 @@ Welcome to Hive documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   apidocs/Hive
+   apidocs/PyMAIA
    apidocs/configs
    apidocs/scripts
    apidocs/tutorials
