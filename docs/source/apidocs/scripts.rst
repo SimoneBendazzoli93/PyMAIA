@@ -11,6 +11,7 @@ PyMAIA Scripts
    PyMAIA_convert_semantic_to_instance_segmentation
    PyMAIA_create_subset
    PyMAIA_order_data_folder
+   PyMAIA_downsample_modality
    PyMAIA_convert_NIFTI_predictions_to_DICOM_SEG
 
 PyMAIA Scripts for nnDetection
