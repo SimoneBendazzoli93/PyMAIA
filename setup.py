@@ -44,6 +44,7 @@ setup(
             "PyMAIA_convert_semantic_to_instance_segmentation = PyMAIA_scripts.PyMAIA_convert_semantic_to_instance_segmentation:main",
             "PyMAIA_create_subset = PyMAIA_scripts.PyMAIA_create_subset:main",
             "PyMAIA_order_data_folder = PyMAIA_scripts.PyMAIA_order_data_folder:main",
+            "PyMAIA_downsample_modality = PyMAIA_scripts.PyMAIA_downsample_modality:main",
 
             "nndet_create_pipeline = PyMAIA_scripts.nndet_create_pipeline:main",
             "nndet_prepare_data_folder = PyMAIA_scripts.nndet_prepare_data_folder:main",
