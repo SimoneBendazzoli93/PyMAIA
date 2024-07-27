@@ -34,14 +34,14 @@ jobs:
           
           
           # install from tar.gz
-          python -m pip install PyMAIA*.tar.gz
+          python -m pip install pymaia*.tar.gz
           python -c 'import PyMAIA; print(PyMAIA.__version__) ' 2>&1 | grep -iv "unknown"
           python -c 'import PyMAIA; print(PyMAIA.__file__)'
           python -m pip uninstall -y PyMAIA
-          rm PyMAIA*.tar.gz
+          rm pymaia*.tar.gz
           
           # install from wheel
-          python -m pip install PyMAIA*.whl
+          python -m pip install pymaia*.whl
           python -c 'import PyMAIA; print(PyMAIA.__version__) ' 2>&1 | grep -iv "unknown"
           python -c 'import PyMAIA; print(PyMAIA.__file__)'
           
