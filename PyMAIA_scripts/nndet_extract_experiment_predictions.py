@@ -7,7 +7,7 @@ from pathlib import Path
 from textwrap import dedent
 
 # from old_src.evaluation import get_results_summary_filepath
-from PyMAIA.utils.file_utils import subfolders
+from PyMAIA.utils.file_utils import subfolders, order_data_folder_by_patient
 from PyMAIA.utils.log_utils import get_logger, add_verbosity_options_to_argparser, log_lvl_from_verbosity_args
 
 DESC = dedent(
@@ -76,15 +76,14 @@ def main():
             "val_predictions_nii",
         )
         if prediction_directory.is_dir():
+            order_data_folder_by_patient(prediction_directory, "_boxes.json")
             subject_predictions = subfolders(prediction_directory, join=False)
             for subject_prediction in subject_predictions:
                 copy_tree(
                     str(Path(prediction_directory).joinpath(subject_prediction)),
                     str(Path(prediction_directory_out).joinpath(subject_prediction)),
                 )
-        else:
 
-            order_data_folder
 
 
 if __name__ == "__main__":

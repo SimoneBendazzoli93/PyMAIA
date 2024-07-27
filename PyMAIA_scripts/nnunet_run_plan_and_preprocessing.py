@@ -81,6 +81,8 @@ def main():
             "-c",
             "3d_fullres",
             "-np",
+            n_workers,
+            "-npfp",
             n_workers
         ]
 

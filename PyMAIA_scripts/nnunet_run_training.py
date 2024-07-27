@@ -131,6 +131,7 @@ def main():
         os.environ["nnUNet_preprocessed"] = data["preprocessing_folder"]
         os.environ["nnUNet_results"] = data["results_folder"]
         os.environ["nnUNet_def_n_proc"] = n_workers
+        os.environ["nnUNet_n_proc_DA"] = n_workers
 
         if args["output_model_file"] is None:
             args["output_model_file"] = str(
