@@ -17,14 +17,8 @@ pydicom
 pydicom_seg
 scipy
 SimpleITK
-torch
 tqdm
 pandas
 scikit_learn
 openpyxl
 mlflow
-monai[nibabel, skimage, scipy, pillow, tensorboard, gdown, ignite, torchvision, itk, tqdm, pandas, mlflow, matplotlib, pydicom]
-fire
-jupyter
-einops
-jupyterlab
