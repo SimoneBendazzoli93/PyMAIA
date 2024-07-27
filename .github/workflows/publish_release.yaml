@@ -68,7 +68,7 @@ jobs:
         name: Check artifacts
         run: |
           ls -al dist/
-          rm dist/PyMAIA*.tar.gz
+          rm dist/pymaia*.tar.gz
           ls -al dist/
 
       - if: startsWith(github.ref, 'refs/tags/')
