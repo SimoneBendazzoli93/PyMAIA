@@ -10,17 +10,21 @@ ipython
 pydata-sphinx-theme
 coloredlogs
 dicom2nifti
-loguru
-matplotlib
 nibabel
+nilearn
 numpy
 pydicom
 pydicom_seg
-pynvml
-scikit_learn
 scipy
 SimpleITK
+torch
 tqdm
-nilearn
 pandas
+scikit_learn
 openpyxl
+mlflow
+monai[nibabel, skimage, scipy, pillow, tensorboard, gdown, ignite, torchvision, itk, tqdm, pandas, mlflow, matplotlib, pydicom]
+fire
+jupyter
+einops
+jupyterlab
