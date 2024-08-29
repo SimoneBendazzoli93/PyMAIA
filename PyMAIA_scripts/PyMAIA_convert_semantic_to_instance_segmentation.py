@@ -100,17 +100,23 @@ def main():
             subject_id = subject[:-len(sem_seg)]
             subject_sem_seg_filename = os.path.join(arguments["data_folder"], subject)
             subject_inst_seg_filename = os.path.join(arguments["inst_seg_folder"], str(subject_id+sem_seg))
-            num_features = semantic_segmentation_to_instance(subject_sem_seg_filename, subject_inst_seg_filename)
-            labels_dict.update({str(subject_id): num_features})
-            print("Subject: ", subject_id, " converted mask done.")
+            if Path(subject_inst_seg_filename).is_file():
+                    print(f"Skipping {subject_id}: Already exist!")
+            else:
+                num_features = semantic_segmentation_to_instance(subject_sem_seg_filename, subject_inst_seg_filename)
+                labels_dict.update({str(subject_id): num_features})
+                print("Subject: ", subject_id, " converted mask done.")
     else:
         subjects = subfolders(arguments["data_folder"], join=False)
         for subject in subjects:
             subject_sem_seg_filename = os.path.join(arguments["data_folder"], subject, str(subject + sem_seg))
             subject_inst_seg_filename = os.path.join(arguments["data_folder"], subject, str(subject + inst_seg))
-            num_features = semantic_segmentation_to_instance(subject_sem_seg_filename, subject_inst_seg_filename)
-            labels_dict.update({str(subject): num_features})
-            print("Subject: ", subject, " converted mask done.")
+            if Path(subject_inst_seg_filename).is_file():
+                    print(f"Skipping {subject}: Already exist!")
+            else:
+                num_features = semantic_segmentation_to_instance(subject_sem_seg_filename, subject_inst_seg_filename)
+                labels_dict.update({str(subject): num_features})
+                print("Subject: ", subject, " converted mask done.")
 
     # Create Json file with number of labels of instance segmentation for each patient.
     with open(out_json, 'w') as json_file:

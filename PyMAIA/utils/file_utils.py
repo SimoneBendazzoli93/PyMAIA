@@ -128,22 +128,22 @@ def create_nnunet_data_folder_tree(data_folder: str, task_name: str, task_id: st
     """  # noqa E501
     logger.log(DEBUG, ' Creating Dataset tree at "{}"'.format(data_folder))
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "imagesTr", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "imagesTr", ).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "labelsTr", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "labelsTr", ).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "imagesTs", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "imagesTs", ).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "labelsTs", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "labelsTs", ).mkdir(
         parents=True,
         exist_ok=True,
     )
