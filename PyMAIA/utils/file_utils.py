@@ -361,6 +361,13 @@ def copy_data_from_dict_to_dataset_folder(
                 updated_image_filename = Path(image_filename).name.replace(image_suffix,
                                                                            modality_code + str(
                                                                                config_dict["FileExtension"]))
+
+                if Path(updated_image_filename).name ==  modality_code + str(
+                                                                               config_dict["FileExtension"]):
+                    parent_dir = Path(image_filename).parent.name
+                    updated_image_filename = image_filename[:-len(modality_code + str(
+                                                                               config_dict["FileExtension"]))] + parent_dir + "_" + modality_code + str(
+                                                                               config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
                         copy_image_file,
@@ -383,6 +390,13 @@ def copy_data_from_dict_to_dataset_folder(
                 updated_label_filename = Path(label_filename).name.replace(label_suffix,
                                                                            str(config_dict["FileExtension"]))
 
+
+                if Path(updated_label_filename).name ==  str(
+                                                                               config_dict["FileExtension"]):
+                    parent_dir = Path(label_filename).parent.name
+                    updated_label_filename = label_filename[:-len(str(
+                                                                               config_dict["FileExtension"]))] + parent_dir + "_" + str(
+                                                                               config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
                         copy_label_file,
@@ -471,6 +485,16 @@ def copy_data_to_dataset_folder(
             if image_filename in files:
                 updated_image_filename = image_filename.replace(image_suffix,
                                                                 modality_code + str(config_dict["FileExtension"]))
+
+
+
+
+                if Path(updated_image_filename).name ==  modality_code + str(
+                                                                               config_dict["FileExtension"]):
+                    parent_dir = Path(image_filename).parent.name
+                    updated_image_filename = image_filename[:-len(modality_code + str(
+                                                                               config_dict["FileExtension"]))] + parent_dir + "_" + modality_code + str(
+                                                                               config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
                         copy_image_file,
@@ -491,6 +515,13 @@ def copy_data_to_dataset_folder(
             if label_filename in files:
 
                 updated_label_filename = label_filename.replace(label_suffix, str(config_dict["FileExtension"]))
+
+                if Path(updated_label_filename).name == str(
+                        config_dict["FileExtension"]):
+                    parent_dir = Path(label_filename).parent.name
+                    updated_label_filename = label_filename[:-len(str(
+                        config_dict["FileExtension"]))] + parent_dir + "_" + str(
+                        config_dict["FileExtension"])
 
                 copied_files.append(
                     pool.starmap_async(
