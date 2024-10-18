@@ -128,22 +128,22 @@ def create_nnunet_data_folder_tree(data_folder: str, task_name: str, task_id: st
     """  # noqa E501
     logger.log(DEBUG, ' Creating Dataset tree at "{}"'.format(data_folder))
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "imagesTr", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "imagesTr", ).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "labelsTr", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "labelsTr", ).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "imagesTs", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "imagesTs", ).mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    Path(data_folder).joinpath("nnUNet_raw_data", "Dataset" + task_id + "_" + task_name, "labelsTs", ).mkdir(
+    Path(data_folder).joinpath("nnUNet_raw", "Dataset" + task_id + "_" + task_name, "labelsTs", ).mkdir(
         parents=True,
         exist_ok=True,
     )
@@ -278,10 +278,13 @@ def copy_image_file(input_filepath: Union[str, PathLike], output_filepath: Union
     output_filepath :
         file path where to copy the file
     """
-    shutil.copy(
-        input_filepath,
-        output_filepath,
-    )
+    try:
+        shutil.copy(
+            input_filepath,
+            output_filepath,
+        )
+    except:
+        print(f"{output_filepath} not copied")
 
 
 def copy_label_file(input_image: Union[str, PathLike], input_label: Union[str, PathLike],
@@ -298,11 +301,16 @@ def copy_label_file(input_image: Union[str, PathLike], input_label: Union[str, P
     output_filepath :
         file location where to save the label image
     """
-    label_nib = nib.load(input_label)
-    image_nib = nib.load(input_image)
-
-    label_nib_out = nib.Nifti1Image(label_nib.get_fdata(), image_nib.affine)
-    nib.save(label_nib_out, output_filepath)
+    try:
+    
+    
+        label_nib = nib.load(input_label)
+        image_nib = nib.load(input_image)
+    
+        label_nib_out = nib.Nifti1Image(label_nib.get_fdata(), image_nib.affine)
+        nib.save(label_nib_out, output_filepath)
+    except:
+        print(f"{output_filepath} not created")
 
 
 def copy_data_from_dict_to_dataset_folder(
@@ -361,6 +369,12 @@ def copy_data_from_dict_to_dataset_folder(
                 updated_image_filename = Path(image_filename).name.replace(image_suffix,
                                                                            modality_code + str(
                                                                                config_dict["FileExtension"]))
+
+                if Path(updated_image_filename).name ==  modality_code + str(
+                                                                               config_dict["FileExtension"]):
+                    parent_dir = Path(image_filename).parent.name
+                    updated_image_filename = parent_dir  + modality_code + str(
+                                                                               config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
                         copy_image_file,
@@ -383,6 +397,12 @@ def copy_data_from_dict_to_dataset_folder(
                 updated_label_filename = Path(label_filename).name.replace(label_suffix,
                                                                            str(config_dict["FileExtension"]))
 
+
+                if Path(updated_label_filename).name ==  str(
+                                                                               config_dict["FileExtension"]):
+                    parent_dir = Path(label_filename).parent.name
+                    updated_label_filename =  parent_dir + str(
+                                                                               config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
                         copy_label_file,
@@ -471,6 +491,15 @@ def copy_data_to_dataset_folder(
             if image_filename in files:
                 updated_image_filename = image_filename.replace(image_suffix,
                                                                 modality_code + str(config_dict["FileExtension"]))
+
+
+
+
+                if Path(updated_image_filename).name ==  modality_code + str(
+                                                                               config_dict["FileExtension"]):
+                    parent_dir = Path(image_filename).parent.name
+                    updated_image_filename = parent_dir + modality_code + str(
+                                                                               config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
                         copy_image_file,
@@ -491,6 +520,12 @@ def copy_data_to_dataset_folder(
             if label_filename in files:
 
                 updated_label_filename = label_filename.replace(label_suffix, str(config_dict["FileExtension"]))
+
+                if Path(updated_label_filename).name == str(
+                        config_dict["FileExtension"]):
+                    parent_dir = Path(label_filename).parent.name
+                    updated_label_filename =  parent_dir + str(
+                        config_dict["FileExtension"])
 
                 copied_files.append(
                     pool.starmap_async(

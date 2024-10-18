@@ -86,7 +86,7 @@ def main():
             n_workers
         ]
 
-        os.environ["nnUNet_raw"] = str(Path(data["base_folder"]).joinpath("nnUNet_raw_data"))
+        os.environ["nnUNet_raw"] = str(Path(data["base_folder"]).joinpath("nnUNet_raw"))
         os.environ["nnUNet_preprocessed"] = data["preprocessing_folder"]
         os.environ["nnUNet_def_n_proc"] = n_workers
         os.environ["nnUNet_results"] = data["results_folder"]

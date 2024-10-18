@@ -80,7 +80,7 @@ def main():
     try:
         dataset_path = str(
             Path(os.environ["raw_data_base"]).joinpath(
-                "nnUNet_raw_data",
+                "nnUNet_raw",
                 "Dataset" + arguments["task_ID"] + "_" + arguments["task_name"],
             )
         )

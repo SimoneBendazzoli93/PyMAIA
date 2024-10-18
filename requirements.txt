@@ -3,18 +3,12 @@ dicom2nifti
 nibabel
 nilearn
 numpy
-pydicom
+pydicom==2.4.4
 pydicom_seg
 scipy
 SimpleITK
-torch
 tqdm
 pandas
 scikit_learn
 openpyxl
 mlflow
-monai[nibabel, skimage, scipy, pillow, tensorboard, gdown, ignite, torchvision, itk, tqdm, pandas, mlflow, matplotlib, pydicom]
-fire
-jupyter
-einops
-jupyterlab
