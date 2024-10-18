@@ -40,13 +40,13 @@ export ROOT_FOLDER=/YOUR/PATH/TO/Experiments
 ```
 To generate the *Pipeline file*, run:
 ```
-Hive_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000
+nndet_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000
 ```
 with `task_id` representing an unique identifier number for the experiment. 
 
 Optionally, you can set the split ratio (in %, set a value between 0-100) between train and test data:
 ```
-Hive_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000 --test-split 20
+nndet_create_pipeline --input-data-folder /PATH/TO/Dataset_folder --config-file /YOUR/CONFIG_FILE.json --task-ID 000 --test-split 20
 ```
 By default, 80% of the available data will be dedicated for cross-fold validation, while 20% will be reserved as testing set.
 
@@ -55,7 +55,7 @@ The *Pipeline file* will be available, as a *txt* file, in `root_experiment_fold
 Once the *Pipeline file* is created, you are ready to run your nnDetection experiment, either with the available script, or by just copying/pasting the single commands from the *txt* file into your shell.
 To run the full pipeline with the **Hive** script:
 ```
-Hive_run_pipeline_from_file --file /YOUR/PIPELINE_FILE.txt
+PyMAIA_run_pipeline_from_file --file /YOUR/PIPELINE_FILE.txt
 ```
 
 ## 4. Extract Predictions

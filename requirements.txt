@@ -3,7 +3,7 @@ dicom2nifti
 nibabel
 nilearn
 numpy
-pydicom
+pydicom==2.4.4
 pydicom_seg
 scipy
 SimpleITK
