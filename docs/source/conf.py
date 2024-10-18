@@ -31,20 +31,20 @@ import PyMAIA
 # The full version, including alpha/beta/rc tags
 release = PyMAIA.__version__
 
-exclude_patterns = ["configs"]
+exclude_patterns = ["configs","monai"]
 
 
 def generate_apidocs(*args):
     """Generate API docs automatically by trawling the available modules"""
     module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "PyMAIA"))
-    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "PyMAIA_scripts"))
+    #scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "PyMAIA_scripts"))
     output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "apidocs"))
     apidoc_command_path = "sphinx-apidoc"
     if hasattr(sys, "real_prefix"):  # called from a virtualenv
         apidoc_command_path = os.path.join(sys.prefix, "bin", "sphinx-apidoc")
         apidoc_command_path = os.path.abspath(apidoc_command_path)
     print(f"output_path {output_path}")
-    print(f"scripts_path {scripts_path}")
+    #print(f"scripts_path {scripts_path}")
     print(f"module_path {module_path}")
     print(f"command_path {apidoc_command_path}")
     subprocess.check_call(
@@ -53,7 +53,7 @@ def generate_apidocs(*args):
         + [module_path]
         + [os.path.join(module_path, p) for p in exclude_patterns]
     )
-    subprocess.check_call([apidoc_command_path, "-e"] + ["-o", output_path] + [scripts_path])
+    #subprocess.check_call([apidoc_command_path, "-e"] + ["-o", output_path] + [scripts_path])
 
 
 # -- General configuration ---------------------------------------------------
