@@ -12,4 +12,3 @@ pandas
 scikit_learn
 openpyxl
 mlflow
-torch

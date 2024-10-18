@@ -278,10 +278,13 @@ def copy_image_file(input_filepath: Union[str, PathLike], output_filepath: Union
     output_filepath :
         file path where to copy the file
     """
-    shutil.copy(
-        input_filepath,
-        output_filepath,
-    )
+    try:
+        shutil.copy(
+            input_filepath,
+            output_filepath,
+        )
+    except:
+        print(f"{output_filepath} not copied")
 
 
 def copy_label_file(input_image: Union[str, PathLike], input_label: Union[str, PathLike],
@@ -298,11 +301,16 @@ def copy_label_file(input_image: Union[str, PathLike], input_label: Union[str, P
     output_filepath :
         file location where to save the label image
     """
-    label_nib = nib.load(input_label)
-    image_nib = nib.load(input_image)
-
-    label_nib_out = nib.Nifti1Image(label_nib.get_fdata(), image_nib.affine)
-    nib.save(label_nib_out, output_filepath)
+    try:
+    
+    
+        label_nib = nib.load(input_label)
+        image_nib = nib.load(input_image)
+    
+        label_nib_out = nib.Nifti1Image(label_nib.get_fdata(), image_nib.affine)
+        nib.save(label_nib_out, output_filepath)
+    except:
+        print(f"{output_filepath} not created")
 
 
 def copy_data_from_dict_to_dataset_folder(
@@ -365,8 +373,7 @@ def copy_data_from_dict_to_dataset_folder(
                 if Path(updated_image_filename).name ==  modality_code + str(
                                                                                config_dict["FileExtension"]):
                     parent_dir = Path(image_filename).parent.name
-                    updated_image_filename = image_filename[:-len(modality_code + str(
-                                                                               config_dict["FileExtension"]))] + parent_dir + "_" + modality_code + str(
+                    updated_image_filename = parent_dir  + modality_code + str(
                                                                                config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
@@ -394,8 +401,7 @@ def copy_data_from_dict_to_dataset_folder(
                 if Path(updated_label_filename).name ==  str(
                                                                                config_dict["FileExtension"]):
                     parent_dir = Path(label_filename).parent.name
-                    updated_label_filename = label_filename[:-len(str(
-                                                                               config_dict["FileExtension"]))] + parent_dir + "_" + str(
+                    updated_label_filename =  parent_dir + str(
                                                                                config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
@@ -492,8 +498,7 @@ def copy_data_to_dataset_folder(
                 if Path(updated_image_filename).name ==  modality_code + str(
                                                                                config_dict["FileExtension"]):
                     parent_dir = Path(image_filename).parent.name
-                    updated_image_filename = image_filename[:-len(modality_code + str(
-                                                                               config_dict["FileExtension"]))] + parent_dir + "_" + modality_code + str(
+                    updated_image_filename = parent_dir + modality_code + str(
                                                                                config_dict["FileExtension"])
                 copied_files.append(
                     pool.starmap_async(
@@ -519,8 +524,7 @@ def copy_data_to_dataset_folder(
                 if Path(updated_label_filename).name == str(
                         config_dict["FileExtension"]):
                     parent_dir = Path(label_filename).parent.name
-                    updated_label_filename = label_filename[:-len(str(
-                        config_dict["FileExtension"]))] + parent_dir + "_" + str(
+                    updated_label_filename =  parent_dir + str(
                         config_dict["FileExtension"])
 
                 copied_files.append(
