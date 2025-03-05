@@ -1,0 +1,93 @@
+{% set name = "pymaia-learn" %}
+{% set version = "1.0rc0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/pymaia_learn-{{ version }}.tar.gz
+  sha256: 6378cf9673c5f2a295069a42392198ba0ec3127e70c18bef5d1a07b29cf5855d
+
+build:
+  entry_points:
+    - PyMAIA_convert_DICOM_dataset_to_NIFTI_dataset = PyMAIA_scripts.PyMAIA_convert_DICOM_dataset_to_NIFTI_dataset:main
+    - PyMAIA_run_pipeline_from_file = PyMAIA_scripts.PyMAIA_run_pipeline_from_file:main
+    - PyMAIA_convert_NIFTI_predictions_to_DICOM_SEG = PyMAIA_scripts.PyMAIA_convert_NIFTI_predictions_to_DICOM_SEG:main
+    - PyMAIA_convert_semantic_to_instance_segmentation = PyMAIA_scripts.PyMAIA_convert_semantic_to_instance_segmentation:main
+    - PyMAIA_create_subset = PyMAIA_scripts.PyMAIA_create_subset:main
+    - PyMAIA_order_data_folder = PyMAIA_scripts.PyMAIA_order_data_folder:main
+    - PyMAIA_downsample_modality = PyMAIA_scripts.PyMAIA_downsample_modality:main
+    - nndet_create_pipeline = PyMAIA_scripts.nndet_create_pipeline:main
+    - nndet_prepare_data_folder = PyMAIA_scripts.nndet_prepare_data_folder:main
+    - nndet_run_preprocessing = PyMAIA_scripts.nndet_run_preprocessing:main
+    - nndet_run_training = PyMAIA_scripts.nndet_run_training:main
+    - nndet_extract_experiment_predictions = PyMAIA_scripts.nndet_extract_experiment_predictions:main
+    - nndet_compute_metric_results = PyMAIA_scripts.nndet_compute_metric_results:main
+    - nnunet_prepare_data_folder = PyMAIA_scripts.nnunet_prepare_data_folder:main
+    - nnunet_run_preprocessing = PyMAIA_scripts.nnunet_run_preprocessing:main
+    - nnunet_run_plan_and_preprocessing = PyMAIA_scripts.nnunet_run_plan_and_preprocessing:main
+    - nnunet_run_training = PyMAIA_scripts.nnunet_run_training:main
+    - nnunet_create_pipeline = PyMAIA_scripts.nnunet_create_pipeline:main
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python >=3.8
+    - pip
+  run:
+    - python >=3.8
+    - coloredlogs
+    - dicom2nifti
+    - nibabel
+    - nilearn
+    - pytorch
+    - numpy
+    - pydicom
+    - pydicom-seg
+    - scipy
+    - simpleitk
+    - tqdm
+    - pandas
+    - scikit-learn
+    - openpyxl
+    - mlflow
+
+test:
+  imports:
+    - PyMAIA
+    - PyMAIA_scripts
+  commands:
+    #- pip check
+    - PyMAIA_convert_DICOM_dataset_to_NIFTI_dataset --help
+    - PyMAIA_run_pipeline_from_file --help
+    - PyMAIA_convert_NIFTI_predictions_to_DICOM_SEG --help
+    - PyMAIA_convert_semantic_to_instance_segmentation --help
+    - PyMAIA_create_subset --help
+    - PyMAIA_order_data_folder --help
+    - PyMAIA_downsample_modality --help
+    - nndet_create_pipeline --help
+    - nndet_prepare_data_folder --help
+    - nndet_run_preprocessing --help
+    - nndet_run_training --help
+    - nndet_extract_experiment_predictions --help
+    #- nndet_compute_metric_results --help
+    - nnunet_prepare_data_folder --help
+    - nnunet_run_preprocessing --help
+    - nnunet_run_plan_and_preprocessing --help
+    - nnunet_run_training --help
+    - nnunet_create_pipeline --help
+  requires:
+    - pip
+
+about:
+  home: https://github.com/SimoneBendazzoli93/PyMAIA.git
+  summary: Python Package to support Deep Learning data preparation, pre-processing. training, result visualization and model deployment across different frameworks (nnUNet, nnDetection, MONAI).
+  license: GPL-3.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - Simben

@@ -715,7 +715,9 @@ def order_data_in_single_folder(
     if assign_parent_dir_name:
         search_regex = "*/*/*"
 
+    search_regex = "*/*"
     for file_path in Path(root_path).glob(search_regex):
+
         if assign_parent_dir_name:
 
             logger.log(
@@ -740,7 +742,10 @@ def order_data_in_single_folder(
             logger.log(DEBUG,
                        "Moving '{}' file to '{}'".format(file_path, Path(output_path).joinpath(Path(file_path).name)))
             Path(file_path).rename(Path(output_path).joinpath(Path(file_path).name))
-    remove_empty_folder_recursive(root_path)
+    
+    if root_path == output_path:
+        logger.log(DEBUG, "Removing empty folders at '{}'".format(root_path))
+        remove_empty_folder_recursive(root_path)
 
 
 def order_data_folder_by_patient(folder_path: Union[str, PathLike], file_pattern: str):
@@ -768,16 +773,32 @@ def order_data_folder_by_patient(folder_path: Union[str, PathLike], file_pattern
 
     for file_path in Path(folder_path).glob("*"):
         if Path(file_path).is_file():
+            matching_patient_ids = []
             for patient_id in patient_id_list:
-
+                
                 if file_path.name.startswith(patient_id):
-                    logger.log(
-                        DEBUG,
-                        "Moving '{}' file to '{}'".format(
-                            file_path, Path(folder_path).joinpath(patient_id, Path(file_path).name)
-                        ),
-                    )
-                    Path(file_path).rename(Path(folder_path).joinpath(patient_id, Path(file_path).name))
+                    matching_patient_ids.append(patient_id)
+                
+            if len(matching_patient_ids) > 1:
+                logger.log(WARN, "Multiple patient IDs found for file: {}".format(file_path))
+                logger.log(WARN, "Matching patient IDs: {}".format(matching_patient_ids))
+                logger.log(WARN, "Selecting the longest ID: {}".format(max(matching_patient_ids, key=len)))
+                matching_patient_id = max(matching_patient_ids, key=len)
+                logger.log(
+                    DEBUG,
+                    "Moving '{}' file to '{}'".format(
+                        file_path, Path(folder_path).joinpath(matching_patient_id, Path(file_path).name)
+                    ),
+                )
+                Path(file_path).rename(Path(folder_path).joinpath(matching_patient_id, Path(file_path).name))
+            elif len(matching_patient_ids) == 1:
+                logger.log(
+                    DEBUG,
+                    "Moving '{}' file to '{}'".format(
+                        file_path, Path(folder_path).joinpath(matching_patient_ids[0], Path(file_path).name)
+                    ),
+                )
+                Path(file_path).rename(Path(folder_path).joinpath(matching_patient_ids[0], Path(file_path).name))
 
 
 def copy_subject_folder_to_data_folder(
