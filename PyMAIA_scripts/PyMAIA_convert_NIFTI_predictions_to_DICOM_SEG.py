@@ -125,7 +125,7 @@ def main():
                      subject_dicom_folder,
                      arguments["template_file"],
                      str(Path(arguments["output_folder"]).joinpath(subject + ".dcm")),
-                     study_id_dict[dicom_subject][subject[-1]]
+                     study_id_dict[dicom_subject][subject[-1]][0]
 
                  ),),
             )
